@@ -1,0 +1,32 @@
+/* 成敗。外部画像の一覧
+   assets/ フォルダに画像（PNG/WebP、背景透過）を置き、下の files に「キー: 'ファイル名'」を足す。
+   書いていないキーは、これまで通りコードで描いた絵が使われる。
+   軽部のラグドール素材は assets/karube/rig.js（tools/build_karube.py が生成）で読み込む。 */
+window.SEIBAI_ASSETS = {
+  dir: 'assets/',
+  files: {
+    bg: 'bg_marukichi_aligned.jpg',   // 2026-11-15 受領。床の線を840に位置合わせ済み（元画像は assets/src/）
+    // 小物（2026-11-15 受領の小物シートから tools/build_props.py で切り出し）
+    jug: 'props/jug.png', shoyu: 'props/shoyu.png', oshibori: 'props/oshibori.png', hashi: 'props/hashi.png',
+    bowl: 'props/bowl.png', salt: 'props/popcorn.png', cara: 'props/popcorn.png',
+    cat: 'props/cat.png', lantern: 'props/lantern.png', top: 'props/top.png', leg: 'props/leg.png',
+    // STAGE 02以降（第2弾の素材。背景は tools/align_bg.sh で床の線を合わせ済み）
+    // 第3弾の背景（2026-11-15受領・床の線を合わせ済み）
+    bg_apparel: 'bg_apparel.jpg', bg_konbini: 'bg_konbini.jpg', bg_ldk: 'bg_ldk.jpg', bg_karaoke: 'bg_karaoke.jpg', bg_cinema: 'bg_cinema.jpg', bg_office: 'bg_office.jpg',
+    bg_street_day: 'bg_street_day.jpg', bg_street_night: 'bg_street_night.jpg', bg_platform: 'bg_platform.jpg', bg_train: 'bg_train.jpg',
+    p_coffee: 'props/coffee.png', p_can: 'props/can.png', p_paperbag: 'props/paperbag.png', p_bench: 'props/bench.png',
+    p_tissue: 'props/tissue.png', p_bottle: 'props/bottle.png', p_newspaper: 'props/newspaper.png',
+    p_backpack: 'props/backpack.png', p_briefcase: 'props/briefcase.png', p_umbrella_l: 'props/umbrella_l.png', p_umbrella_s: 'props/umbrella_s.png', p_phone: 'props/phone.png', p_hangad: 'props/hangad.png',
+    // 第3弾の小物（2026-11-15受領）
+    p_hanger: 'props/hanger.png', p_shoebox: 'props/shoebox.png', p_lighter: 'props/lighter.png', p_gum: 'props/gum.png', p_cushion: 'props/cushion.png', p_orange: 'props/orange.png', p_icebox: 'props/icebox.png', p_maracas: 'props/maracas.png', p_tambourine: 'props/tambourine.png', p_mic: 'props/mic.png', p_ricecooker: 'props/ricecooker.png', p_shamoji: 'props/shamoji.png', p_mcup: 'props/mcup.png', p_ricebag: 'props/ricebag.png', p_docs: 'props/docs.png', p_stapler: 'props/stapler.png', p_sticky: 'props/sticky.png', p_mug: 'props/mug.png', p_popbucket: 'props/popbucket.png', p_drink: 'props/drink.png',
+    // 主人公（2026-11-16受領。右向き3ポーズ）
+    /* 主人公：相手役と同じ絵柄の版（hero_c）。前の版は assets/hero_b/、その前は assets/hero/ に残してある */
+    hero_normal: 'hero_c/normal.png', hero_talk: 'hero_c/talk.png', hero_trouble: 'hero_c/trouble.png', hero_seat: 'hero_b/seat.png', hero_try_normal: 'hero_c/try_normal.png', hero_try_talk: 'hero_c/try_talk.png', hero_try_trouble: 'hero_c/try_trouble.png',
+    // エキストラ（既存の人物を暗くして使う仮の絵）
+    npc_chikoku: 'npc/chikoku.png', npc_catch: 'npc/catch.png', npc_r_seat: 'npc/r_seat.png', npc_r_salary: 'npc/r_salary.png', npc_r_student: 'npc/r_student.png', npc_r_coat: 'npc/r_coat.png', npc_r_elder: 'npc/r_elder.png', npc_q_salary: 'npc/q_salary.png', npc_q_student: 'npc/q_student.png', npc_q_coat: 'npc/q_coat.png', npc_q_elder: 'npc/q_elder.png', npc_tabako: 'npc/tabako.png', npc_omata: 'npc/omata.png', npc_warikomi: 'npc/warikomi.png', npc_meigara: 'npc/meigara.png', npc_yukimi: 'npc/yukimi.png', npc_hamori: 'npc/hamori.png', npc_sumaho: 'npc/sumaho.png', npc_buyuden: 'npc/buyuden.png', npc_suihanki: 'npc/suihanki.png', npc_sekasu: 'npc/sekasu.png', npc_apparel: 'npc/apparel.png',
+    p_flyer: 'props/flyer.png', p_ashtray: 'props/ashtray.png', p_bucket: 'props/bucket.png', p_asign: 'props/asign.png',
+    /* 線画版（Open Peeps の人物・線画に変換した背景と小物） */
+    npc_pp_coat: 'peeps_out/coat.png', npc_pp_elder: 'peeps_out/elder.png', npc_pp_ex_a: 'peeps_out/ex_a.png', npc_pp_ex_b: 'peeps_out/ex_b.png', npc_pp_ex_c: 'peeps_out/ex_c.png', npc_pp_ex_d: 'peeps_out/ex_d.png', hero_pp_normal: 'peeps_out/hero_normal.png', hero_pp_seat: 'peeps_out/hero_seat.png', hero_pp_talk: 'peeps_out/hero_talk.png', hero_pp_trouble: 'peeps_out/hero_trouble.png', hero_pp_try_normal: 'peeps_out/hero_try_normal.png', hero_pp_try_talk: 'peeps_out/hero_try_talk.png', hero_pp_try_trouble: 'peeps_out/hero_try_trouble.png', npc_pp_omata_spread: 'peeps_out/omata_spread.png', npc_pp_omata_closed: 'peeps_out/omata_closed.png', npc_pp_salary: 'peeps_out/salary.png', npc_pp_seat: 'peeps_out/seat.png', npc_pp_student: 'peeps_out/student.png', bg_line_apparel: 'bg_line/apparel.jpg', bg_line_cinema: 'bg_line/cinema.jpg', bg_line_karaoke: 'bg_line/karaoke.jpg', bg_line_konbini: 'bg_line/konbini.jpg', bg_line_ldk: 'bg_line/ldk.jpg', bg_line_marukichi_aligned: 'bg_line/marukichi_aligned.jpg', bg_line_office: 'bg_line/office.jpg', bg_line_platform: 'bg_line/platform.jpg', bg_line_street_day: 'bg_line/street_day.jpg', bg_line_street_night: 'bg_line/street_night.jpg', bg_line_train: 'bg_line/train.jpg', p_coffee_line: 'props_line/coffee.png', p_can_line: 'props_line/can.png', p_paperbag_line: 'props_line/paperbag.png', p_bench_line: 'props_line/bench.png', p_tissue_line: 'props_line/tissue.png', p_bottle_line: 'props_line/bottle.png', p_newspaper_line: 'props_line/newspaper.png', p_backpack_line: 'props_line/backpack.png', p_briefcase_line: 'props_line/briefcase.png', p_umbrella_l_line: 'props_line/umbrella_l.png', p_umbrella_s_line: 'props_line/umbrella_s.png', p_phone_line: 'props_line/phone.png', p_hangad_line: 'props_line/hangad.png', p_hanger_line: 'props_line/hanger.png', p_shoebox_line: 'props_line/shoebox.png', p_lighter_line: 'props_line/lighter.png', p_gum_line: 'props_line/gum.png', p_cushion_line: 'props_line/cushion.png', p_orange_line: 'props_line/orange.png', p_icebox_line: 'props_line/icebox.png', p_maracas_line: 'props_line/maracas.png', p_tambourine_line: 'props_line/tambourine.png', p_mic_line: 'props_line/mic.png', p_ricecooker_line: 'props_line/ricecooker.png', p_shamoji_line: 'props_line/shamoji.png', p_mcup_line: 'props_line/mcup.png', p_ricebag_line: 'props_line/ricebag.png', p_docs_line: 'props_line/docs.png', p_stapler_line: 'props_line/stapler.png', p_sticky_line: 'props_line/sticky.png', p_mug_line: 'props_line/mug.png', p_popbucket_line: 'props_line/popbucket.png', p_drink_line: 'props_line/drink.png', p_flyer_line: 'props_line/flyer.png', p_ashtray_line: 'props_line/ashtray.png', p_bucket_line: 'props_line/bucket.png', p_asign_line: 'props_line/asign.png',
+    // key_visual: 'key_visual.webp',
+  }
+};
