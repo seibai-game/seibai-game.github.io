@@ -126,7 +126,7 @@ canvas{display:block;width:100%;height:100%;touch-action:none;}
 .rank:before{content:"RANK";display:block;font-size:calc(var(--u)*8.5);letter-spacing:.12em;margin-bottom:calc(var(--u)*2);}
 .rank.stamp{animation:stamp .4s cubic-bezier(.2,1.7,.4,1) both;}
 @keyframes stamp{0%{transform:scale(2.2) rotate(-10deg);opacity:0}100%{transform:none;opacity:1}}
-.scoreBox{flex:1;}
+.scoreBox{flex:1;} /* リザルト：称号・爽快感・再挑戦が主役。修理代は下に小さく */.feat.win{color:var(--shu);font-size:calc(var(--u)*27);margin:calc(var(--u)*2) 0 calc(var(--u)*10);} .feat.sub{font-size:calc(var(--u)*17);margin:0;align-self:center;} .stats.big .stat b{font-size:calc(var(--u)*24);} .stats.big{margin:calc(var(--u)*6) 0 calc(var(--u)*8);} .feelRow{display:flex;align-items:flex-end;justify-content:space-between;gap:calc(var(--u)*10);margin:calc(var(--u)*6) 0 0;} .feelRow .titleLbl{margin:0;} .feelRow .score{font-size:calc(var(--u)*36);} .feelRow .best{text-align:right;margin:0 0 calc(var(--u)*6);} .btn.retry2{margin-top:calc(var(--u)*8);} .money{margin:calc(var(--u)*12) 0 calc(var(--u)*6);display:flex;align-items:baseline;justify-content:space-between;gap:calc(var(--u)*10);} .money .titleLbl{margin:0;max-width:52%;white-space:pre-line;} .money .score{font-size:calc(var(--u)*20) !important;} .money .best{text-align:right;}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);margin:0 0 calc(var(--u)*16);}
 .stat{padding:calc(var(--u)*10) calc(var(--u)*2);text-align:center;border-bottom:1px solid rgba(25,25,25,.2);}
 .stat+.stat{border-left:1px solid rgba(25,25,25,.2);}
@@ -204,9 +204,10 @@ canvas{display:block;width:100%;height:100%;touch-action:none;}
     <div id="how" class="ov sheet hidden" role="dialog" aria-label="遊び方">
       <header><h2>遊び方</h2><button class="btn x" data-close aria-label="閉じる">×</button></header>
       <ol class="how">
-        <li><b>引っぱって、離して、飛ばす</b>相手を指で後ろへ引っぱると、飛ぶ軌道が出る。離すと反対向きにすっ飛んで、店の物を巻き込んで壊す。</li>
-        <li><b>投げられるのは5回</b>どこに当てれば一番まとめて壊せるか、狙って投げる。損害が溜まると「ブチギレMAX」で次の一投は破壊力2倍。</li>
-        <li><b>★3つを目指す</b>破壊率で★が決まる。チャレンジ3つも達成して、ビフォー・アフターをシェアしよう。</li>
+        <li><b>わかる！ 腹立つ！</b>日常の「法律違反じゃないけど腹が立つ」場面を、タップで読み進める。</li>
+        <li><b>タップで殴る（8秒）</b>相手をタップして殴る。輪が小さくなった瞬間に殴るとクリティカル。連打でコンボがつながる。</li>
+        <li><b>引っぱって、トドメ</b>相手を指で引っぱって離すと、すっ飛んで店の物を巻き込む。全部、頭の中の話。</li>
+        <li><b>スッキリして、次へ</b>現実では、小さく解決。爽快スコアと称号を見て、次の成敗へ。</li>
       </ol>
       <p class="mono" style="font-size:calc(var(--u)*9.5);opacity:.6;margin:calc(var(--u)*14) 0 0;line-height:1.6">人物イラスト：Open Peeps by Pablo Stanley（CC0）／効果音：Kenney（CC0）</p>
       <button class="btn close" data-close>わかった</button>
@@ -219,15 +220,14 @@ canvas{display:block;width:100%;height:100%;touch-action:none;}
     <div id="result" class="ov hidden">
       <div class="rCard">
         <p class="rHead mono"><span><b id="rNo">STAGE 01</b>　<span id="rName"></span></span><span>RESULT</span></p>
+        <p class="titleLbl mono">今回の称号</p>
+        <p class="feat win" id="rWin"></p>
         <img id="rShot" class="shot" alt="今回の一撃">
-        <p class="titleLbl mono">今回の一撃</p>
-        <p class="feat" id="rFeat"></p>
-        <div class="row">
-          <div class="scoreBox"><div class="score"><span id="rScore">0</span><small>点</small></div><div class="best mono" id="rBest"></div></div>
-          <div class="rank" id="rRank">S</div>
-        </div>
-        <div class="stats" id="rStats"></div>
-        <button id="retry" class="btn primary">もう一回成敗する</button>
+        <div class="feelRow"><div class="scoreBox"><p class="titleLbl mono">爽快スコア</p><div class="score"><span id="rScore">0</span><small>点</small></div></div><div class="best mono" id="rBest"></div></div>
+        <div class="stats big" id="rStats"></div>
+        <div class="hidden"><p id="rFeat"></p><div class="rank" id="rRank"></div><p id="rMoneyLbl"></p></div>
+        <button id="nextStage" class="btn primary">次の成敗へ ▶</button>
+        <button id="retry" class="btn ghost retry2">もう一回</button>
         <div class="shareRow">
           <button id="shareVid" class="btn share vid">▶ 動画でシェア<small id="vidNote">いまの成敗を動画で</small></button>
           <button id="share" class="btn share img">画像でシェア</button>
@@ -240,63 +240,63 @@ canvas{display:block;width:100%;height:100%;touch-action:none;}
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
 <!-- 外部画像の一覧。assets/ に画像を置いたら、このファイルに名前を足す（無ければ全部コード描画で動く） -->
-<script src="assets/manifest.js?v=1794892181"></script>
+<script src="assets/manifest.js?v=1794968971"></script>
 <!-- 軽部のラグドール素材（tools/build_karube.py が生成）。無ければ従来のコード描画の軽部で動く -->
-<script src="assets/karube/rig.js?v=1794892181"></script>
-<script src="assets/chars_out/chikoku/rig.js?v=1794892181"></script>
-<script src="assets/chars_out/catch/rig.js?v=1794892181"></script>
-<script src="assets/chars_out/tabako/rig.js?v=1794892181"></script>
-<script src="assets/chars_out/warikomi/rig.js?v=1794892181"></script>
-<script src="assets/chars_out/omata/rig.js?v=1794892181"></script>
-<script src="assets/chars_out/apparel/rig.js?v=1794892181"></script>
-<script src="assets/chars_out/meigara/rig.js?v=1794892181"></script>
-<script src="assets/chars_out/yukimi/rig.js?v=1794892181"></script>
-<script src="assets/chars_out/hamori/rig.js?v=1794892181"></script>
-<script src="assets/chars_out/sumaho/rig.js?v=1794892181"></script>
-<script src="assets/chars_out/buyuden/rig.js?v=1794892181"></script>
-<script src="assets/chars_out/suihanki/rig.js?v=1794892181"></script>
-<script src="assets/chars_out/sekasu/rig.js?v=1794892181"></script>
-<script src="assets/chars_out/tameguchi/rig.js?v=1794892181"></script>
-<script src="assets/chars_out/kucharer/rig.js?v=1794892181"></script>
+<script src="assets/karube/rig.js?v=1794968971"></script>
+<script src="assets/chars_out/chikoku/rig.js?v=1794968971"></script>
+<script src="assets/chars_out/catch/rig.js?v=1794968971"></script>
+<script src="assets/chars_out/tabako/rig.js?v=1794968971"></script>
+<script src="assets/chars_out/warikomi/rig.js?v=1794968971"></script>
+<script src="assets/chars_out/omata/rig.js?v=1794968971"></script>
+<script src="assets/chars_out/apparel/rig.js?v=1794968971"></script>
+<script src="assets/chars_out/meigara/rig.js?v=1794968971"></script>
+<script src="assets/chars_out/yukimi/rig.js?v=1794968971"></script>
+<script src="assets/chars_out/hamori/rig.js?v=1794968971"></script>
+<script src="assets/chars_out/sumaho/rig.js?v=1794968971"></script>
+<script src="assets/chars_out/buyuden/rig.js?v=1794968971"></script>
+<script src="assets/chars_out/suihanki/rig.js?v=1794968971"></script>
+<script src="assets/chars_out/sekasu/rig.js?v=1794968971"></script>
+<script src="assets/chars_out/tameguchi/rig.js?v=1794968971"></script>
+<script src="assets/chars_out/kucharer/rig.js?v=1794968971"></script>
 <!-- 自前の絵（人物・背景・小物を同じ決まりでコードから描く）。STAGE 03 から順に切り替え -->
-<script src="assets/charkit.js?v=1794892181"></script>
-<script src="assets/cast.js?v=1794892181"></script>
-<script src="assets/kit_bg.js?v=1794892181"></script>
+<script src="assets/charkit.js?v=1794968971"></script>
+<script src="assets/cast.js?v=1794968971"></script>
+<script src="assets/kit_bg.js?v=1794968971"></script>
 <!-- 人物：Open Peeps（CC0, Pablo Stanley）。assets/peeps/LICENSE_openpeeps.txt -->
 <!-- 線画の相手役（tools/peeps_export.html で書き出し済み） -->
-<script src="assets/chars_peep/apparel/rig.js?v=1794892181"></script>
-<script src="assets/chars_peep/buyuden/rig.js?v=1794892181"></script>
-<script src="assets/chars_peep/catch/rig.js?v=1794892181"></script>
-<script src="assets/chars_peep/chikoku/rig.js?v=1794892181"></script>
-<script src="assets/chars_peep/hamori/rig.js?v=1794892181"></script>
-<script src="assets/chars_peep/karube/rig.js?v=1794892181"></script>
-<script src="assets/chars_peep/kucharer/rig.js?v=1794892181"></script>
-<script src="assets/chars_peep/meigara/rig.js?v=1794892181"></script>
-<script src="assets/chars_peep/omata/rig.js?v=1794892181"></script>
-<script src="assets/chars_peep/sekasu/rig.js?v=1794892181"></script>
-<script src="assets/chars_peep/suihanki/rig.js?v=1794892181"></script>
-<script src="assets/chars_peep/sumaho/rig.js?v=1794892181"></script>
-<script src="assets/chars_peep/tabako/rig.js?v=1794892181"></script>
-<script src="assets/chars_peep/tameguchi/rig.js?v=1794892181"></script>
-<script src="assets/chars_peep/warikomi/rig.js?v=1794892181"></script>
-<script src="assets/chars_peep/yukimi/rig.js?v=1794892181"></script>
+<script src="assets/chars_peep/apparel/rig.js?v=1794968971"></script>
+<script src="assets/chars_peep/buyuden/rig.js?v=1794968971"></script>
+<script src="assets/chars_peep/catch/rig.js?v=1794968971"></script>
+<script src="assets/chars_peep/chikoku/rig.js?v=1794968971"></script>
+<script src="assets/chars_peep/hamori/rig.js?v=1794968971"></script>
+<script src="assets/chars_peep/karube/rig.js?v=1794968971"></script>
+<script src="assets/chars_peep/kucharer/rig.js?v=1794968971"></script>
+<script src="assets/chars_peep/meigara/rig.js?v=1794968971"></script>
+<script src="assets/chars_peep/omata/rig.js?v=1794968971"></script>
+<script src="assets/chars_peep/sekasu/rig.js?v=1794968971"></script>
+<script src="assets/chars_peep/suihanki/rig.js?v=1794968971"></script>
+<script src="assets/chars_peep/sumaho/rig.js?v=1794968971"></script>
+<script src="assets/chars_peep/tabako/rig.js?v=1794968971"></script>
+<script src="assets/chars_peep/tameguchi/rig.js?v=1794968971"></script>
+<script src="assets/chars_peep/warikomi/rig.js?v=1794968971"></script>
+<script src="assets/chars_peep/yukimi/rig.js?v=1794968971"></script>
 <!-- カラー線画版の相手役（標準。#look=a で白黒線画） -->
-<script src="assets/chars_peepc/apparel/rig.js?v=1794892181"></script>
-<script src="assets/chars_peepc/buyuden/rig.js?v=1794892181"></script>
-<script src="assets/chars_peepc/catch/rig.js?v=1794892181"></script>
-<script src="assets/chars_peepc/chikoku/rig.js?v=1794892181"></script>
-<script src="assets/chars_peepc/hamori/rig.js?v=1794892181"></script>
-<script src="assets/chars_peepc/karube/rig.js?v=1794892181"></script>
-<script src="assets/chars_peepc/kucharer/rig.js?v=1794892181"></script>
-<script src="assets/chars_peepc/meigara/rig.js?v=1794892181"></script>
-<script src="assets/chars_peepc/omata/rig.js?v=1794892181"></script>
-<script src="assets/chars_peepc/sekasu/rig.js?v=1794892181"></script>
-<script src="assets/chars_peepc/suihanki/rig.js?v=1794892181"></script>
-<script src="assets/chars_peepc/sumaho/rig.js?v=1794892181"></script>
-<script src="assets/chars_peepc/tabako/rig.js?v=1794892181"></script>
-<script src="assets/chars_peepc/tameguchi/rig.js?v=1794892181"></script>
-<script src="assets/chars_peepc/warikomi/rig.js?v=1794892181"></script>
-<script src="assets/chars_peepc/yukimi/rig.js?v=1794892181"></script>
+<script src="assets/chars_peepc/apparel/rig.js?v=1794968971"></script>
+<script src="assets/chars_peepc/buyuden/rig.js?v=1794968971"></script>
+<script src="assets/chars_peepc/catch/rig.js?v=1794968971"></script>
+<script src="assets/chars_peepc/chikoku/rig.js?v=1794968971"></script>
+<script src="assets/chars_peepc/hamori/rig.js?v=1794968971"></script>
+<script src="assets/chars_peepc/karube/rig.js?v=1794968971"></script>
+<script src="assets/chars_peepc/kucharer/rig.js?v=1794968971"></script>
+<script src="assets/chars_peepc/meigara/rig.js?v=1794968971"></script>
+<script src="assets/chars_peepc/omata/rig.js?v=1794968971"></script>
+<script src="assets/chars_peepc/sekasu/rig.js?v=1794968971"></script>
+<script src="assets/chars_peepc/suihanki/rig.js?v=1794968971"></script>
+<script src="assets/chars_peepc/sumaho/rig.js?v=1794968971"></script>
+<script src="assets/chars_peepc/tabako/rig.js?v=1794968971"></script>
+<script src="assets/chars_peepc/tameguchi/rig.js?v=1794968971"></script>
+<script src="assets/chars_peepc/warikomi/rig.js?v=1794968971"></script>
+<script src="assets/chars_peepc/yukimi/rig.js?v=1794968971"></script>
 <script>
 (function(){
 'use strict';
@@ -306,7 +306,7 @@ const W=540,H=960,FLOOR=840,PX_PER_M=165,THROW_TIME=15;
 /* とどめに使う卓（テーブル／ベンチなど）の位置と大きさ。ステージ設定 table で上書き */
 let TABLE_TOP=745,TB={cx:135,w:232};
 const CAT_DEF=1,CAT_FLOOR=2,CAT_STAFF=4,CAT_PROJ=8,CAT_TABLE=16,CAT_SHELF=32,CAT_WALLP=128,GHOST_MASK=0xFFFFFFFF&~CAT_DEF;
-const BASE_ZOOM=1.1,BASE_CX=256,BASE_CY=524; // 左端の「お通し代 440円」の貼り紙が見えるよう少し左寄り
+const BASE_ZOOM=1.1,BASE_CX=256,BASE_CY=524; // 左端の貼り紙が見えるよう少し左寄り
 const SERVE_X=305;
 const SMASHLIKE=()=>GAME_MODE==='smash'||GAME_MODE==='harisen'; // 店の物が壊れる遊び方
 /* 遊び方の切り替え：words＝セリフを叩き返す（新）／throw＝引いて投げる（従来）。URLに ?mode=throw で従来版 */
@@ -320,11 +320,11 @@ const REDUCED=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').
 /* 初期16ステージ案（原案のまま保持。STAGE 01のみ実装） */
 /* 各ステージの「場所」と「腹の立つ点」（TOPのカード用。16ステージ制作計画 v1 より） */
 function pyramid(k,x0,w,h,rows,price,name){const out=[];for(let r=0;r<rows;r++)for(let i=0;i<rows-r;i++)out.push([k,x0+(r*w/2)+i*w,FLOOR-h/2-r*h,w,h,price,name,{m:0.4,th:3}]);return out;}
-const STAGE_META=[['大衆居酒屋','ポップコーンを出して、440円。'],['駅前','55分遅れて「ごめん、いま起きた（笑）」'],['駅のホーム','並んでいる列の先頭に、すっと入る。'],['アパレルショップ','「服はいいですよ。服は」'],
-  ['コンビニ','番号を聞いても、銘柄名で言い直す。'],['大衆居酒屋','半分食べてから「タレにしてよ」'],['繁華街','歩きタバコの煙を、こっちに吹く。'],['繁華街','断っても、横歩きで付いてくる。'],
-  ['リビング','断っても「二個あるじゃん」'],['カラオケ','「一人で歌いたい」のに、下ハモで再参戦。'],['映画館','上映中に、スマホが光る。'],['会議室','同じ武勇伝、今月5回目。'],
-  ['台所','空っぽの炊飯器が、保温のまま。'],['まる吉（昼）','くちゃくちゃしながら話しかけてくる。'],['オフィス','約束は18時。17時52分に「まだ？」'],['電車','座席で大股、2人分。']];
-const STAGES=['お通しがポップコーン','当たり前のように遅刻する友達','電車の割り込み並び','えらそうなアパレル店員','タバコを銘柄名で注文する客（番号で言ってくれ）','居酒屋でタメ口のえらそうな客','路上喫煙しているヤリラフィ','しつこい居酒屋キャッチ','雪見だいふく一個くれていってくるやつ','カラオケで勝手にハモってくる奴','映画館でスマホを光らせる人','自分の武勇伝を何度も話す上司','米がないのに釜の前保温のままの炊飯器を放置する夫','くちゃらー','今やってるのに急かしてくる上司','電車の大股広げているおじさんサラリーマン'];
+const STAGE_META=[['大衆居酒屋','ポップコーンが出てきて、600円。'],['駅前','30分過ぎて「いま起きた！」。55分遅れて「誤差じゃん」'],['駅のホーム','列の横をすり抜けて、無言で先頭へ。'],['アパレルショップ','「普段は、もっとシンプルな感じですよね？」'],
+  ['コンビニ','番号でお願いされても「それくらい覚えといてよ」'],['大衆居酒屋','半分食べてから「タレにして。常連なんだけど」'],['繁華街','路上禁煙の通りで、煙をこっちに流す。'],['繁華街','断っても横に並んで、前に回り込む。'],
+  ['リビング','「2個あるじゃん。1個ずつでちょうどいいって」'],['カラオケ','「一人で歌いたい」のに「じゃ、下ね」'],['映画館','「すぐなんで」と言いながら、画面がさらに明るく。'],['会議室','同じ武勇伝、3週連続。オチまで知ってる。'],
+  ['台所','空っぽの炊飯器が保温のまま。「パンでよくない？」'],['定食屋（昼）','先輩が、くちゃくちゃ食べながら仕事の話。'],['オフィス','約束は18時。17時台に3回「今どこ？」'],['電車','膝を大きく開いて、隣の人が縮こまる。']];
+const STAGES=['お通しがポップコーン','当たり前のように遅刻する友達','電車の割り込み並び','えらそうなアパレル店員','タバコを銘柄名で注文する客（番号で言ってくれ）','居酒屋でタメ口のえらそうな客','路上喫煙しているヤリラフィ','しつこい居酒屋キャッチ','2個入りアイスを1個くれと言ってくるやつ','カラオケで勝手にハモってくる奴','映画館でスマホを光らせる人','自分の武勇伝を何度も話す上司','米がないのに釜の前保温のままの炊飯器を放置する夫','くちゃらー','今やってるのに急かしてくる上司','電車の大股広げているおじさんサラリーマン'];
 
 const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 const wrap=document.getElementById('wrap'),stageEl=document.getElementById('stage');
@@ -582,12 +582,13 @@ async function buildArt(){
   jobs.push(rasterize(bgSVG(),540,960,2).then(c=>{BG=c;}));
   await Promise.all(jobs);
   for(const k in EXT){if(k==='bg'||k==='fg'||k==='key_visual')continue;ART[k]=EXT[k];if(PART_SVG[k])ART[k+'_far']=tint(EXT[k],0.32);}
+  for(const k of ['top','leg'])if(ART[k]&&ART[k].width){const c=document.createElement('canvas');c.width=ART[k].naturalWidth||ART[k].width;c.height=ART[k].naturalHeight||ART[k].height;const x=c.getContext('2d');x.filter='saturate(0.25)';x.drawImage(ART[k],0,0);ART[k]=c;} /* 卓の赤いしみが血に見えないよう、色を抜く */
   if(EXT.bg){const c=document.createElement('canvas');c.width=1080;c.height=1920;c.getContext('2d').drawImage(EXT.bg,0,0,1080,1920);BG=c;BG.ext=true;}
   if(EXT.fg)ART.fg=EXT.fg;
   popSprites();
-  if(BG.ext){ // 外部背景のときは、コード描画の品書きは重ねず、白紙の貼り紙に「お通し代 440円」だけ書く
+  if(BG.ext){ // 外部背景のときは、コード描画の品書きは重ねず、（貼り紙には何も書かない）
     const sg=SD.layoutExt&&SD.layoutExt.sign;if(sg){const x=BG.getContext('2d');x.setTransform(2,0,0,2,0,0);x.translate(sg.x,sg.y);x.rotate(sg.rot);x.textAlign='center';x.textBaseline='middle';
-      x.globalAlpha=0.88;x.fillStyle='#2a1a12';x.font='800 11px '+FM;x.fillText('お通し代',0,-16);x.fillStyle='#B8331F';x.font='900 19px '+FM;x.fillText('440円',0,8);x.globalAlpha=1;x.setTransform(1,0,0,1,0,0);}
+      /* お通し代の貼り紙は出さない（「メニューに書いてなかった」結末と合わせる） */x.setTransform(1,0,0,1,0,0);}
     return;}
   // text layers on background (webfont)
   const x=BG.getContext('2d');x.setTransform(2,0,0,2,0,0);
@@ -598,7 +599,7 @@ async function buildArt(){
     x.fillStyle=C.ink;x.font='800 15px '+FM;x.textAlign='center';x.textBaseline='top';for(let k=0;k<m[0].length;k++)x.fillText(m[0][k],0.5,8+k*16);
     x.fillStyle=C.red;x.font='800 11px '+FM;for(let k=0;k<m[1].length;k++)x.fillText(m[1][k],0.5,h-44+k*11.5);x.restore();});
   x.fillStyle=C.white;x.font='900 14px '+FM;x.textAlign='center';x.fillText('金星ラガー',68,408);
-  x.save();x.translate(130,306);x.rotate(-4*Math.PI/180);x.fillStyle=C.ink;x.font='800 12px '+FM;x.fillText('お通し代',43,24);x.fillStyle=C.red;x.font='900 21px '+FM;x.fillText('440円',43,50);x.restore();
+  
 }
 function popSprites(){
   for(const [k,a,b] of [['salt','#FFF6DE','#E8D3A2'],['cara','#F4C06A','#C9882E']]){
@@ -619,8 +620,8 @@ const EXT={};
 function loadImg(src){return new Promise(res=>{const i=new Image();i.decoding='async';i.onload=()=>res(i);i.onerror=()=>res(null);i.src=src;});}
 async function loadExternal(){
   const m=window.SEIBAI_ASSETS,files=(m&&m.files)||{},dir=(m&&m.dir)||'assets/';
-  /* 線画モード：小物は線画に変換した版（props_line/）を読む */const BGL={bg:'marukichi_aligned',bg_apparel:'apparel',bg_konbini:'konbini',bg_ldk:'ldk',bg_karaoke:'karaoke',bg_cinema:'cinema',bg_office:'office',bg_street_day:'street_day',bg_street_night:'street_night',bg_platform:'platform',bg_train:'train'};
-  const src=k=>!window.LINE_MODE?files[k]:BGL[k]?'bg_line/'+BGL[k]+'.jpg':/^props\//.test(files[k])?files[k].replace(/^props\//,'props_line/'):files[k];
+  /* 線画モード：小物は平塗り＋輪郭線に作り直した版（props_flat/。tools/flat_props.html）を読む */const BGL={bg:'marukichi_aligned',bg_apparel:'apparel',bg_konbini:'konbini',bg_ldk:'ldk',bg_karaoke:'karaoke',bg_cinema:'cinema',bg_office:'office',bg_street_day:'street_day',bg_street_night:'street_night',bg_platform:'platform',bg_train:'train'};
+  const src=k=>!window.LINE_MODE?files[k]:BGL[k]?'bg_line/'+BGL[k]+'.jpg':/^props\//.test(files[k])?files[k].replace(/^props\//,'props_flat/'):files[k];
   await Promise.all(Object.keys(files).map(k=>{if(!ASSET_SPEC[k]&&!/^(bg_|p_|npc_|hero_)/.test(k))return null;if(window.LINE_MODE&&/^(bg_line_|p_.*_line$)/.test(k))return null;return loadImg(dir+src(k)).then(img=>{if(img)EXT[k]=img;else console.warn('[成敗] 画像が読めません:',files[k]);});}));
   // キャラクターのラグドール素材（rig.js で登録された全員）。1キャラでも欠けたら、そのキャラは従来の絵
   /* 人物の素材は重い（全員で約20MB）ので、STAGE 01と、URLで指定されたステージの人物だけ先に読み、残りは裏で順に読む */
@@ -629,6 +630,8 @@ async function loadExternal(){
     await Promise.all([...Object.entries(rig.parts).map(([n,d])=>loadImg(base+d.file).then(img=>{if(img)k.parts[n]={...d,img,far:null};else ok=false;})),
       ...Object.entries(rig.heads).map(([n,d])=>loadImg(base+d.file).then(img=>{if(img)k.heads[n]={...d,img};else ok=false;}))]);
     if(!ok){console.warn('[成敗] '+name+' の素材が一部読めません');return;}
+    /* 全身1枚の絵（頭と体を素材の決まった位置で重ねたもの）。部品に分けると首と頭がずれるので、あればこちらで描く */
+    if(rig.peeps&&/chars_peepc\//.test(rig.dir||'')){const full={};await Promise.all(Object.keys(rig.heads).map(e=>loadImg(base+'full_'+e+'.png').then(img=>{if(img)full[e]=img;})));if(Object.keys(full).length===Object.keys(rig.heads).length)k.full=full;}
     for(const n of ['uarm','farm','thigh','shin']){const pt=k.parts[n],c=document.createElement('canvas');c.width=pt.img.naturalWidth;c.height=pt.img.naturalHeight;c.getContext('2d').drawImage(pt.img,0,0);pt.far=tint(c,0.38);}
     CHARS[name]=k;};
   const hs=/s=(\d+)/.exec(location.hash),first=new Set(['karube',(STAGE_DEFS[1]||{}).char,hs&&STAGE_DEFS[+hs[1]]&&STAGE_DEFS[+hs[1]].char].filter(Boolean));
@@ -814,8 +817,8 @@ function staffAI(s,dt){
 function baseExpr(s){if(s.beaten)return 'dizzy';return s.act==='bow'?'bow':s.hurt>0?'confused':'smile';} // 一度倒されたら、やられた顔で固定
 function hurtFor(s,t){if(G.phase==='throw'||G.phase==='words')s.hurt=Math.max(s.hurt,t);}
 function setExpr(s,e,dur){if(s.beaten&&(e==='smile'||e==='smug'||e==='bow'||e==='blank'||e==='confused'))e='dizzy';if(s.mode==='rag'&&e!=='gag'&&e!=='blank'&&e!=='dizzy')return;s.expr=e;s.exprT=dur||0;}
-function say(text,dur,expr){G.bubbles=G.bubbles.filter(b=>b.who!=='staff');G.bubbles.push({who:'staff',text,t:dur||1.6,age:0});if(expr)setExpr(G.staff,expr,dur);}
-function playerSay(text,dur){G.bubbles=G.bubbles.filter(b=>b.who!=='me');G.bubbles.push({who:'me',text,t:dur||1.4,age:0});}
+function say(text,dur,expr){G.bubbles=G.bubbles.filter(b=>b.who!=='staff'&&b.who!=='me'); /* 吹き出しは片方ずつ出す */G.bubbles.push({who:'staff',text,t:dur||1.6,age:0});if(expr)setExpr(G.staff,expr,dur);}
+function playerSay(text,dur){G.bubbles=G.bubbles.filter(b=>b.who!=='me'&&b.who!=='staff'); /* 吹き出しは片方ずつ出す（重ねない） */G.bubbles.push({who:'me',text,t:dur||1.4,age:0});}
 
 /* ================= world ================= */
 const ITEM_DEFS=[
@@ -828,25 +831,25 @@ const ITEM_DEFS=[
    仕組み（物理・カメラ・演出・リザルト）は全ステージ共通。STAGES（原案16本）の名前はそのまま使う */
 const STAGE_DEFS={
   1:{
-    scene:'金曜 21:04　大衆居酒屋 まる吉',winTitle:'440円の恨み、店ごと晴らした',hariWords:['440円取るな！','ポップコーンて！','お通しちゃうやろ！','断らせろ！'],
+    scene:'金曜 21:04　大衆居酒屋 まる吉',winTitle:'伝票から、600円が消えた',hariWords:['600円取るな！','ポップコーンて！','説明してや！','お席代て何！'],
     /* 物理物の配置。layout＝コード描画の背景用、layoutExt＝外部背景（assets/bg_marukichi_aligned.png）の絵に合わせた配置 */
     layout:{catShelf:[360,384,80],cat:[360,359],jugShelf:[467,500,145],jugs:[425,465,505],jugY:470,lantern:[250,50],steam:[440,530,470]},
     layoutExt:{catShelf:[251,297,195],cat:[190,272],jugShelf:[472,501,135],jugs:[430,470,510],jugY:471,lantern:[305,40],steam:[410,540,405],
       // 店ごとぶっ壊す用に増やした物：招き猫の棚のジョッキ、厨房カウンターのジョッキのピラミッド、提灯2つ
       extraShelves:[[472,418,135]],
-      tears:[[0,161,122,260,'品書き',2000],[122,161,245,260,'品書き',2000],[245,161,367,260,'品書き',2000],[7,299,65,388,'お通し代の貼り紙',44000,'sign'],[387,167,553,319,'のれん',15000,'noren']],extraJugs:[[240,269],[275,269],[310,269],[437,388],[470,388],[503,388],[453,342],[487,342],[470,296]],lanterns:[[118,40,120],[205,40,175]],
+      tears:[[0,161,122,260,'品書き',2000],[122,161,245,260,'品書き',2000],[245,161,367,260,'品書き',2000],[7,299,65,388,'お品書きの貼り紙',44000,'sign'],[387,167,553,319,'のれん',15000,'noren']],extraJugs:[[240,269],[275,269],[310,269],[437,388],[470,388],[503,388],[453,342],[487,342],[470,296]],lanterns:[[118,40,120],[205,40,175]],
       sign:{x:36,y:343,rot:-0.02}},
     items:ITEM_DEFS,
     lines:{
       idle:['ごゆっくり〜','おかわり自由じゃないでーす','キャラメルと塩、ハーフ＆ハーフでーす'],
-      serve:'お通しでーす。こちらポップコーンです',me:'これ、お通しなんですか？',charge:'はいっ。お一人440円いただいてまーす',
+      serve:'お通しでーす。こちらポップコーンです',me:'……これが、お通し？',charge:'はい、うちのお通しで。お一人600円です',
       ret:'伝票、置いときまーす',bye:'ありがとうございましたー',
-      hit:['いてっ','え、なに？','は？'],knock:'ぐえっ',final:'……お通し代、440円です。',
+      hit:['いてっ','え、なに？','は？'],knock:'ぐえっ',final:'……ポンッ（最後の1粒が弾ける）',
       idleHurt:['……ごゆっくりどうぞ','（チッ）','……何か？']},
     // 投げる前のツッコミ（プレイヤーの心の声）。1行ずつ叩きつけるように出る
-    tsukkomi:['ポップコーン','ちょびっとで','440円！？'],
+    tsukkomi:['ポップコーンで','600円！？'], /* 器は大きいので「ちょびっと」とは言わない */
     ochi:[{say:['おかわり、いかがですか？',1.8,'smile'],wait:2.0},{me:['……いや結構です',1.6],wait:1.8}],
-    slip:{title:'御会計',item:'お通し',price:'440円',note:'（ポップコーン）',hand:'¥440'},
+    slip:{title:'御会計',item:'お通し',price:'600円',note:'（ポップコーン）',hand:'¥600'},
     hint:{throw:'卓上の物を、引いて離して投げる',finisher:'テーブルを長押し → 離して、ちゃぶ台返し'},
     finisher:{name:'ちゃぶ台返し',sound:'ドガシャーン'},
     share:{text:'お通しがポップコーンだったので成敗した。',tags:'#成敗 #お通しがポップコーン'},
@@ -865,8 +868,8 @@ const STAGE_DEFS={
   }
 };
 /* ---------- STAGE 02 当たり前のように遅刻する友達（駅前・昼）：とどめはベンチ返し ---------- */
-STAGE_DEFS[2]={
-  scene:'土曜 13:30　駅前の商店街',hariWords:['30分て！','今起きたちゃうわ！','謝れ！'],starPct:[40,70,92],oneShot:14,winTitle:'55分の恨み、商店街ごと晴らした',cmp:['コーヒー代',450],mission:{t:'自販機を割る',name:'自販機'},
+STAGE_DEFS[2]={holdProp:{key:'p_drink',w:22,h:34,dx:-34,dy:66,ph:['intro','ochi']},
+  scene:'土曜　駅前の商店街',hariWords:['30分て！','今起きたちゃうわ！','謝れ！'],starPct:[40,70,92],oneShot:14,winTitle:'55分の恨み、商店街ごと晴らした',cmp:['コーヒー代',450],mission:{t:'自販機を割る',name:'自販機'},
   words:['ごめーん今起きた','え、30分しか？','で、どこ行く？','電車が遅れててさ','寝坊じゃないよ','あと5分で着く','先に並んでて'],char:'chikoku',bg:'bg_street_day',startX:560,returnHold:'none',
   layout:{},layoutExt:{
     tears:[[50,430,195,470,'看板',20000],[220,445,318,495,'ラーメン屋の看板',15000],[328,430,495,490,'ドラッグストアの看板',25000],[52,530,210,565,'のれん',8000,'noren'],[490,545,540,705,'自販機',60000,'glass'],[342,530,488,700,'店のガラス',40000,'glass']],
@@ -893,7 +896,7 @@ STAGE_DEFS[2]={
     hit:['いてっ','え、なに？','ちょ、なんで？'],knock:'ぐえっ',
     ret:'ごめんって〜、ほんとごめん',bye:'じゃ、行こっか',final:'……で、どこ行く？'},
   slip:null,
-  card:{rows:[['待ち合わせ','13:00'],['到着','13:30']],imgs:['p_coffee','p_paperbag']},
+  card:{rows:[['待ち合わせ','13:00'],['到着','13:55']],imgs:['p_coffee','p_paperbag']},
   hint:{throw:'持ち物を、引いて離して投げる',finisher:'ベンチを長押し → 離して、ベンチ返し'},
   finisher:{name:'ベンチ返し',sound:'ガッシャーン'},
   share:{text:'55分遅れてきた友達を成敗した。',tags:'#成敗 #遅刻する友達'},
@@ -909,8 +912,8 @@ STAGE_DEFS[2]={
   }
 };
 /* ---------- STAGE 07 路上喫煙（夜の繁華街）：とどめは打ち水バケツ ---------- */
-STAGE_DEFS[7]={
-  scene:'金曜 22:10　夜の繁華街',char:'tabako',hariWords:['煙こっち来とる！','歩きタバコやめ！','灰皿持て！'],oneShot:14,winTitle:'通りごと、鎮火',cmp:['携帯灰皿',300],
+STAGE_DEFS[7]={holdProp:{key:'p_ashtray',w:24,h:16,dx:-24,dy:30,ph:['ochi'],after:2.0},
+  scene:'金曜 22:10　夜の繁華街',char:'tabako',hariWords:['煙こっち来とる！','路上喫煙やめ！','灰皿持て！'],oneShot:14,winTitle:'通りごと、鎮火',cmp:['携帯灰皿',300],
   words:['ふぅ〜','煙そっち行った？','ここ吸っていいでしょ','灰皿ないんだよね','風向きのせい','一本だけだから'],bg:'bg_street_night',startX:560,returnHold:'none',smoke:true,
   layout:{},layoutExt:{tears:[[15,395,55,435,'街灯',15000,'glass'],[118,430,158,470,'街灯',15000,'glass'],[140,495,248,545,'看板',20000],[325,330,475,420,'窓',30000,'glass'],[65,552,248,598,'テント',12000,'noren'],[320,598,465,640,'のれん',8000,'noren'],[485,585,535,655,'提灯',12000,'glass'],[510,385,540,500,'電飾看板',25000,'glass'],[160,600,222,690,'花屋のガラス',30000,'glass']],
     brk:pyramid('p_can',462,22,34,4,120,'空き缶')},mission:{t:'提灯を割る',name:'提灯'},
@@ -933,12 +936,12 @@ STAGE_DEFS[7]={
     idle:['ふぅ〜','この辺、灰皿ないんだよね','（タバコをくわえる）'],
     idleHurt:['……え、なに？','（舌打ち）','……灰皿ないし'],
     hit:['いてっ','あっつ！','は？'],knock:'ぐえっ',
-    ret:'あ、まだいたの？　ふぅ〜',bye:'じゃ、おつかれ〜',final:'……携帯灰皿、持ってます。'},
+    ret:'あ、まだいたの？　ふぅ〜',bye:'じゃ、おつかれ〜',final:'……火、消します。'},
   slip:null,
   card:{rows:[['この通り','路上喫煙禁止'],['煙の行き先','こっち']],imgs:['p_ashtray','p_bucket']},
   hint:{throw:'足元の物を、引いて離して投げる',finisher:'バケツを長押し → 離して、打ち水'},
   finisher:{name:'打ち水バケツ',sound:'バッシャーン',splash:'water'},
-  share:{text:'歩きタバコの煙を、通りごと成敗した。',tags:'#成敗 #路上喫煙'},
+  share:{text:'路上喫煙の煙を、通りごと成敗した。',tags:'#成敗 #路上喫煙'},
   feat(st){
     if(st.just&&st.maxDist/PX_PER_M>2)return 'ジャスト打ち水';
     if(st.splash>=2)return 'ずぶ濡れ消火';
@@ -951,11 +954,11 @@ STAGE_DEFS[7]={
 };
 /* ---------- STAGE 08 しつこい居酒屋キャッチ（夜の繁華街）：とどめは立て看板返し ---------- */
 STAGE_DEFS[8]={
-  scene:'金曜 22:30　夜の繁華街',char:'catch',hariWords:['行かんて！','しつこい！','ついてくんな！'],oneShot:14,winTitle:'通りごと、お断りした',cmp:['飲み放題',1980],
+  scene:'金曜 22:30　夜の繁華街',char:'catch',hariWords:['行かんて！','しつこい！','ついてくんな！'],oneShot:14,winTitle:'キャッチごと、お断りした',cmp:['飲み放題',1980],
   words:['お兄さん一軒目？','飲み放題2時間','今なら半額','二軒目は？','LINE交換しません？','ちょっとだけ','怪しくないっす'],bg:'bg_street_night',startX:560,returnHold:'none',
   layout:{},layoutExt:{tears:[[15,395,55,435,'街灯',15000,'glass'],[118,430,158,470,'街灯',15000,'glass'],[140,495,248,545,'看板',20000],[325,330,475,420,'窓',30000,'glass'],[65,552,248,598,'テント',12000,'noren'],[320,598,465,640,'のれん',8000,'noren'],[485,585,535,655,'提灯',12000,'glass'],[510,385,540,500,'電飾看板',25000,'glass'],[160,600,222,690,'花屋のガラス',30000,'glass']],
     brk:pyramid('p_can',462,22,34,4,120,'空き缶')},mission:{t:'電飾看板を割る',name:'電飾看板'},
-  table:{cx:232,w:108,top:690,img:'p_asign',ix:-54,iy:-8,iw:108,ih:150},
+  table:{cx:470,w:108,top:690,img:'p_asign',ix:-54,iy:-8,iw:108,ih:150},
   items:[
     {key:'p_tissue',name:'ティッシュ',x:32,w:34,h:24,m:0.5,max:22,air:0.03,rest:0.15,spin:0.2,pull:150,dw:40,dh:30,ground:true},
     {key:'p_flyer',name:'チラシ',x:64,w:24,h:30,m:0.3,max:22,air:0.04,rest:0.1,spin:0.4,pull:150,dw:30,dh:36,ground:true},
@@ -974,9 +977,9 @@ STAGE_DEFS[8]={
   tsukkomi:['断ってるのに','横歩きで','ついてくるな！！'],
   lines:{
     idle:['お兄さんお兄さん','今だけ半額っす','LINE交換しません？'],
-    idleHurt:['……え、なんで？','（チラシを拾う）','……また来ます'],
+    idleHurt:['……え、なんで？','（看板を直す）','……また来ます'],
     hit:['いてっ','え、なに？','ちょ、お兄さん？'],knock:'ぐえっ',
-    ret:'ほんとに一杯だけ！　お願いします！',bye:'じゃ、また今度〜',final:'……他のお店、紹介しますね。'},
+    ret:'ほんとに一杯だけ！　お願いします！',bye:'じゃ、また今度〜',final:'……看板、たたみます。'},
   slip:null,
   card:{rows:[['断った回数','3回'],['ついてきた距離','50m']],imgs:['p_flyer','p_tissue']},
   hint:{throw:'渡された物を、引いて離して投げる',finisher:'看板を長押し → 離して、立て看板返し'},
@@ -1007,7 +1010,7 @@ STAGE_DEFS[3]={
     {key:'p_briefcase',name:'カバン',x:184,w:48,h:40,m:1.6,max:21,air:0.02,rest:0.1,spin:0.15,pull:180,dw:54,dh:46}],
   script:[{walk:SERVE_X},{say:['あ、すみません〜',1.5,'smile'],wait:1.7},{me:['……ずっと並んでたんですけど',1.5],wait:1.7},{say:['え？　ここ列でした？',1.8,'smug'],focus:true,wait:2.0},{cutin:true}],
   tsukkomi:['列の先頭に','すっと','入るな！！'],
-  lines:{idle:['（スマホを見る）','急いでるんで','あ、電車来た'],idleHurt:['……え、なに？','（舌打ち）','……並べばいいんでしょ'],hit:['いてっ','え、なに？','は？'],knock:'ぐえっ',ret:'すみません〜、急いでるんで',bye:'お先でーす',final:'……次の電車で行きます。'},
+  lines:{idle:['（スマホを見る）','急いでるんで','あ、ドア開く'],idleHurt:['……え、なに？','（舌打ち）','……並べばいいんでしょ'],hit:['いてっ','え、なに？','は？'],knock:'ぐえっ',ret:'すみません〜、急いでるんで',bye:'お先でーす',final:'……次の電車で行きます。'},
   slip:null,card:{rows:[['並んだ時間','12分'],['割り込み','3秒']],imgs:['p_phone','p_briefcase']},
   hint:{throw:'持ち物を、引いて離して投げる',finisher:'ベンチを長押し → 離して、ベンチ返し'},finisher:{name:'ベンチ返し',sound:'ガッシャーン'},
   share:{text:'割り込んできた人を、駅ごと成敗した。',tags:'#成敗 #割り込み'},
@@ -1015,20 +1018,20 @@ STAGE_DEFS[3]={
 };
 /* ---------- STAGE 16 電車の大股広げているおじさんサラリーマン（電車の車内・夜） ---------- */
 STAGE_DEFS[16]={
-  scene:'木曜 21:40　帰りの電車',hariWords:['足閉じろ！','2人分や！','詰めろ！'],oneShot:12,winTitle:'車内ごと、詰めさせた',cmp:['初乗り運賃',180],char:'omata',bg:'bg_train',startX:560,returnHold:'none',mission:{t:'窓を割る',name:'窓'},
-  words:['ふぅ〜','空いてるじゃん','そっち座れば？','足が長いもんで','疲れてるんだよ'],
+  scene:'木曜 21:40　帰りの電車',hariWords:['足閉じろ！','2人分や！','詰めろ！'],oneShot:12,winTitle:'一人分、空けさせた',cmp:['初乗り運賃',180],char:'omata',bg:'bg_train',startX:560,returnHold:'none',mission:{t:'窓を割る',name:'窓'},
+  words:['ふぅ〜','空いてるじゃん','立ってればいいじゃん','足が長いもんで','疲れてるんだよ'],
   layout:{},layoutExt:{
     tears:[[115,330,300,520,'窓',30000,'glass'],[315,330,490,520,'窓',30000,'glass'],[25,370,98,460,'広告',8000],[505,370,540,460,'広告',8000],[20,185,180,245,'中吊り広告',6000],[185,185,400,245,'中吊り広告',6000],[405,185,540,245,'中吊り広告',6000],[20,125,255,152,'蛍光灯',12000,'glass'],[355,125,535,152,'蛍光灯',12000,'glass']],
     ledges:[[278,612,520]],
-    brk:[['p_backpack',60,612-25,46,50,9000,'リュック',{m:1.2}],['p_umbrella_l',100,612-31,14,62,1500,'傘',{m:0.6}],['p_paperbag',240,612-25,42,50,3000,'紙袋',{m:1}],...pyramid('p_can',470,22,34,3,120,'空き缶')]},
+    brk:[['p_backpack',60,612-25,46,50,9000,'リュック',{m:1.2}],['p_umbrella_l',100,612-31,14,62,1500,'傘',{m:0.6}],['p_paperbag',158,612-25,42,50,3000,'紙袋',{m:1}]/* 足を引いた後に空く席（x 240 前後）には物を置かない */,...pyramid('p_can',470,22,34,3,120,'空き缶')]},
   table:{none:true,cx:270,w:10,top:612},
   items:[
     {key:'p_newspaper',name:'新聞',x:140,w:46,h:16,m:0.7,max:24,air:0.02,rest:0.1,spin:0.25,pull:155,dw:52,dh:30,top:612},
     {key:'p_bottle',name:'ペットボトル',x:180,w:14,h:38,m:1.0,max:25,air:0.006,rest:0.3,spin:0.45,pull:160,liquid:'water',dw:18,dh:44,top:612},
-    {key:'p_briefcase',name:'カバン',x:300,w:48,h:40,m:1.6,max:21,air:0.02,rest:0.1,spin:0.15,pull:180,dw:54,dh:46,top:612}],
+    {key:'p_briefcase',name:'カバン',x:392,w:48,h:40,m:1.6,max:21,air:0.02,rest:0.1,spin:0.15,pull:180,dw:54,dh:46,top:612}] /* カバンは本人の横の席に（顔に重ならないように。荷物でも1席使っている） */,
   script:[{walk:SERVE_X},{say:['ふぅ〜（ドカッ）',1.5,'smile'],wait:1.7},{me:['……少し詰めてもらえます？',1.5],wait:1.7},{say:['ん？　空いてるじゃん、そっち',1.8,'smug'],focus:true,wait:2.0},{cutin:true}],
   tsukkomi:['2人分','座って','空いてる言うな！！'],
-  lines:{idle:['ふぅ〜','（新聞を広げる）','今日も疲れたな'],idleHurt:['……え、なに？','（咳払い）','……詰めればいいんでしょ'],hit:['いてっ','え、なに？','は？'],knock:'ぐえっ',ret:'あ、ここ空いてるよ（足は閉じない）',bye:'お疲れさーん',final:'……どうぞ、座ってください。'},
+  lines:{idle:['ふぅ〜','（スマホを見る）','今日も疲れたな'],idleHurt:['……え、なに？','（咳払い）','……足、引けばいいんでしょ'],hit:['いてっ','え、なに？','は？'],knock:'ぐえっ',ret:'あ、ここ空いてるよ（足は引かない）',bye:'お疲れさーん',final:'……どうぞ、座ってください。'},
   slip:null,card:{rows:[['座席','7人掛け'],['この人','2人分']],imgs:['p_newspaper','p_briefcase']},
   hint:{throw:'持ち物を、引いて離して投げる',finisher:''},finisher:{name:'座席の押し詰め',sound:'ギュウゥッ'},
   share:{text:'大股で2席占領していた人を、車内ごと成敗した。',tags:'#成敗 #大股'},
@@ -1042,26 +1045,26 @@ STAGE_DEFS[4]=mk({scene:'日曜 15:20　セレクトショップ',char:'apparel'
   script:SC('何かお探しですか〜？','……（このシャツ、いいな）','あ〜それ、お客様にはちょっと…（笑）'),tsukkomi:['似合うか','どうかは','こっちが決める！！'],
   words:['それはちょっと…','サイズあります？','あ、そっちですか','今季の色なんで'],hariWords:['鼻で笑うな！','似合うわ！','接客せえ！'],
   lines:{idle:['（腕を組む）','お似合いですよ〜（棒）','それ、人を選ぶんで'],idleHurt:['……え、なに？','（舌打ち）','……他も見てきます？'],hit:['いてっ','は？','え、なに？'],knock:'ぐえっ',ret:'またのお越しを〜',bye:'ありがとうございました〜',final:'……サイズ、お探ししますね。'},
-  card:{rows:[['試着','3着'],['鼻で笑われた','3回']],imgs:[]},share:{text:'頼んでない品評をしてくる店員を、店ごと成敗した。',tags:'#成敗 #アパレル店員'}});
+  card:{rows:[['試着','1着'],['「普段着ないですよね」','1回']],imgs:[]},share:{text:'頼んでない品評をしてくる店員を、店ごと成敗した。',tags:'#成敗 #アパレル店員'}});
 STAGE_DEFS[5]=mk({scene:'水曜 23:10　コンビニのレジ',char:'meigara',bg:'bg_konbini',cmp:['タバコ代',600],mission:{t:'タバコの棚を崩す',name:'タバコの棚'},winTitle:'番号で言え、を通した',
   script:SC('あれちょうだい、あの青いやつ','……何番ですか？','だから、あの青いやつだって'),tsukkomi:['番号で','言って','くれ！！'],
-  words:['あの青いやつ','いつものやつ','分かるでしょ','番号とか知らない','早くして'],hariWords:['番号で言え！','いつものて誰や！','指させ！'],
-  lines:{idle:['まだ？','（レジを指で叩く）','いつものやつ'],idleHurt:['……は？','（舌打ち）','……32番'],hit:['いてっ','は？','え、なに？'],knock:'ぐえっ',ret:'早くしてよ',bye:'どうも',final:'……32番で。'},
-  card:{rows:[['番号','32番'],['聞き返した','3回']],imgs:[]},share:{text:'銘柄名で注文する客を、レジごと成敗した。',tags:'#成敗 #番号で言って'}});
-STAGE_DEFS[6]=mk({scene:'金曜 21:30　大衆居酒屋 まる吉',char:'tameguchi',bg:'bg',cmp:['生ビール',550],mission:{t:'のれんを破る',name:'のれん'},winTitle:'タメ口ごと、まる吉から出禁',
+  words:['スカイ・ライト','いつものやつ','分かるでしょ','番号とか知らない','早くして'],hariWords:['番号で言え！','いつものて誰や！','指させ！'],
+  lines:{idle:['まだ？','（レジを指で叩く）','いつものやつ'],idleHurt:['……は？','（舌打ち）','……32番'],hit:['いてっ','は？','え、なに？'],knock:'ぐえっ',ret:'早くしてよ',bye:'どうも',final:'……すみません、番号で言います。'},
+  card:{rows:[['番号','32番'],['聞き返した','2回']],imgs:[]},share:{text:'銘柄名で注文する客を、レジごと成敗した。',tags:'#成敗 #番号で言って'}});
+STAGE_DEFS[6]=mk({armExt:true,yakitori:true,scene:'金曜 21:30　大衆居酒屋 まる吉',char:'tameguchi',bg:'bg',cmp:['生ビール',550],mission:{t:'のれんを破る',name:'のれん'},winTitle:'タメ口ごと、まる吉から出禁',
   script:SC('おい、ビールまだ？',  '……（隣の卓、うるさいな）','おい兄ちゃん、遅えよ'),tsukkomi:['店員さんに','タメ口','きくな！！'],
   words:['おい、ビールまだ？','遅えよ','これ頼んでねえし','早くしろって','兄ちゃん'],hariWords:['タメ口やめ！','敬語使え！','待て！'],
-  lines:{idle:['おい','まだかよ','兄ちゃん、こっち'],idleHurt:['……あ？','（ビールをあおる）','……すみませんでした'],hit:['いてっ','あ？','なんだよ'],knock:'ぐえっ',ret:'おい、会計',bye:'じゃあな',final:'……すみませんでした。'},
+  lines:{idle:['おい','まだかよ','兄ちゃん、こっち'],idleHurt:['……あ？','（ビールをあおる）','……すみませんでした'],hit:['いてっ','あ？','なんだよ'],knock:'ぐえっ',ret:'おい、会計',bye:'じゃあな',final:'……塩で、いただきます。'},
   card:{rows:[['注文','生ビール'],['タメ口','5回']],imgs:[]},share:{text:'半分食べてから作り直させようとする客を、まる吉ごと成敗した。',tags:'#成敗 #タメ口'}});
-STAGE_DEFS[9]=mk({scene:'土曜 22:00　家のリビング',char:'yukimi',bg:'bg_ldk',cmp:['雪見だいふく',150],mission:{t:'テレビを割る',name:'テレビ'},winTitle:'2個とも、守り抜いた',
-  script:SC('あ、いいの食べてる〜','……2個しかないやつ','1個ちょうだい♡'),tsukkomi:['2個しか','ないのに','1個言うな！！'],
-  words:['1個ちょうだい','いいじゃん','半分でいいから','ケチ','あーん'],hariWords:['2個しかないんや！','自分で買え！','あーんちゃうわ！'],
-  lines:{idle:['いいなぁ','ちょうだい','あーん'],idleHurt:['……え、だめ？','（スプーンを置く）','……ピノでいい'],hit:['いてっ','え、なに？','ちょっと！'],knock:'ぐえっ',ret:'ね、1個だけ',bye:'ケチ〜',final:'……ピノでいいです。'},
-  card:{rows:[['雪見だいふく','2個'],['ちょうだい','1個']],imgs:[]},share:{text:'断っても雪見だいふくを狙われて、部屋ごと成敗した。',tags:'#成敗 #雪見だいふく'}});
-STAGE_DEFS[10]=mk({scene:'金曜 23:50　カラオケボックス',char:'hamori',bg:'bg_karaoke',cmp:['30分の室料',600],mission:{t:'モニターを割る',name:'モニター'},winTitle:'ソロで歌いきった',
+STAGE_DEFS[9]=mk({scene:'土曜 22:00　家のリビング',char:'yukimi',bg:'bg_ldk',cmp:['2個入りアイス',150],mission:{t:'テレビを割る',name:'テレビ'},winTitle:'二個とも、守り抜いた',
+  script:SC('あ、いいの食べてる〜','……二個しかないやつ','1個ちょうだい♡'),tsukkomi:['二個しか','ないのに','1個言うな！！'],
+  words:['1個ちょうだい','いいじゃん','半分でいいから','ケチ','あーん'],hariWords:['二個しかないんや！','自分で買え！','あーんちゃうわ！'],
+  lines:{idle:['いいなぁ','ちょうだい','あーん'],idleHurt:['……え、だめ？','（手を引っこめる）','……ピノでいい'],hit:['いてっ','え、なに？','ちょっと！'],knock:'ぐえっ',ret:'ね、1個だけ',bye:'ケチ〜',final:'……ピノでいいです。'},
+  card:{rows:[['2個入りアイス','2個'],['「1個ちょうだい」','1回']],imgs:[]},share:{text:'2個入りアイスを「1個ちょうだい」と言われて、脳内で成敗した。',tags:'#成敗 #2個入りアイス'}});
+STAGE_DEFS[10]=mk({mics:true,scene:'金曜 23:50　カラオケボックス',char:'hamori',bg:'bg_karaoke',cmp:['30分の室料',600],mission:{t:'モニターを割る',name:'モニター'},winTitle:'ソロで歌いきった',
   script:SC('（サビで勝手にハモる）〜♪','……ソロで歌いたいんだけど','え、ハモったほうが良くない？'),tsukkomi:['ここ','ソロや','ハモるな！！'],
   words:['ハモっていい？','ここ上いくわ','いい感じじゃん','もう1回サビ','マイク貸して'],hariWords:['ハモるな！','ソロや！','マイク返せ！'],
-  lines:{idle:['〜♪','次なに入れる？','いい感じ〜'],idleHurt:['……え、だめ？','（マイクを置く）','……次なに入れる？'],hit:['いてっ','え？','ちょ、歌ってるのに'],knock:'ぐえっ',ret:'もう1曲いく？',bye:'延長する？',final:'……次、何入れる？'},
+  lines:{idle:['〜♪','次、何入れる？','いい感じ〜'],idleHurt:['……え、だめ？','（マイクを置く）','……次なに入れる？'],hit:['いてっ','え？','ちょ、歌ってるのに'],knock:'ぐえっ',ret:'もう1曲いく？',bye:'延長する？',final:'……次、何入れる？'},
   card:{rows:[['歌った曲','1曲'],['ハモられた','全部']],imgs:[]},share:{text:'勝手にハモってくる友達を、カラオケごと成敗した。',tags:'#成敗 #ハモるな'}});
 STAGE_DEFS[11]=mk({scene:'土曜 19:40　映画館',char:'sumaho',bg:'bg_cinema',cmp:['映画のチケット',2000],mission:{t:'スクリーンを破る',name:'スクリーン'},winTitle:'上映中は、暗いままにした',
   script:SC('（スマホがピカーッ）','……まぶしいんだけど','ちょっとLINE返すだけだから'),tsukkomi:['上映中に','スマホ','光らすな！！'],
@@ -1071,26 +1074,27 @@ STAGE_DEFS[11]=mk({scene:'土曜 19:40　映画館',char:'sumaho',bg:'bg_cinema'
 STAGE_DEFS[12]=mk({scene:'月曜 10:00　会議室',char:'buyuden',bg:'bg_office',cmp:['会議の時給',3000],mission:{t:'ホワイトボードを割る',name:'ホワイトボード'},winTitle:'その話、もう聞かずに済んだ',
   script:SC('俺が若い頃はな〜','……その話、今月5回目です','まあ聞けって、ここからがいいとこ'),tsukkomi:['その話','もう5回','聞いた！！'],
   words:['俺が若い頃は','ここからがいいとこ','あの時はな','伝説なんだよ','まあ聞けって'],hariWords:['5回目や！','もう知っとる！','仕事しよ！'],
-  lines:{idle:['俺が若い頃はな','あれは伝説','まあ聞け'],idleHurt:['……え、なに？','（咳払い）','……その話、前もしたか'],hit:['いてっ','おい','なんだ'],knock:'ぐえっ',ret:'で、どこまで話したっけ',bye:'いい話だったろ',final:'……その話、前もしたか。'},
-  card:{rows:[['同じ話','5回目'],['会議時間','60分']],imgs:[]},share:{text:'同じ武勇伝を5回する上司を、会議室ごと成敗した。',tags:'#成敗 #武勇伝'}});
+  lines:{idle:['俺が若い頃はな','あれは伝説','まあ聞け'],idleHurt:['……え、なに？','（咳払い）','……その話、前もしたか'],hit:['いてっ','おい','なんだ'],knock:'ぐえっ',ret:'で、どこまで話したっけ',bye:'いい話だったろ',final:'……会議、始めようか。'},
+  card:{rows:[['同じ話','3週連続'],['会議時間','60分']],imgs:[]},share:{text:'同じ武勇伝を毎週する上司を、会議室ごと成敗した。',tags:'#成敗 #武勇伝'}});
 // STAGE 13 は人を投げない：投げるのは空っぽの炊飯器（相手は驚くだけ）
-STAGE_DEFS[13]=mk({scene:'日曜 19:00　家の台所',char:'suihanki',bg:'bg_ldk',cmp:['お米5kg',2500],mission:{t:'食器棚を割る',name:'食器棚'},winTitle:'米、炊いときます',
+STAGE_DEFS[13]=mk({noLegOff:true,scene:'日曜 18:00　家の台所',char:'suihanki',bg:'bg_ldk',cmp:['お米5kg',2500],mission:{t:'食器棚を割る',name:'食器棚'},winTitle:'空っぽの保温、終わらせた',
   projectile:{key:'p_ricecooker',name:'空っぽの炊飯器',w:60,h:52,m:5,at:[150,690]},
   script:SC('ふぅ〜（スマホを見る）','……炊飯器、空なのに保温になってる','え？　そうなの？'),tsukkomi:['空っぽで','保温','しとくな！！'],
   words:['え、そうなの？','あとでやる','気づかなかった','まだ大丈夫'],hariWords:['米ないやん！','保温切れ！','炊け！'],
   lines:{idle:['（スマホを見る）','あとでやる','ふぅ〜'],idleHurt:['……え、なに？','（スマホを置く）','……米、炊いときます'],hit:['いてっ','え？','なに？'],knock:'ぐえっ',ret:'あとでやるって',bye:'おやすみ〜',final:'……米、炊いときます。'},
-  card:{rows:[['お米','0合'],['保温','12時間']],imgs:[]},share:{text:'空っぽで保温の炊飯器を、台所ごと成敗した。',tags:'#成敗 #炊飯器'}});
-STAGE_DEFS[14]=mk({scene:'火曜 12:20　まる吉（ランチ営業）',char:'kucharer',bg:'bg',cmp:['日替わり定食',850],mission:{t:'のれんを破る',name:'のれん'},winTitle:'静かに食べてもらった',
+  card:{rows:[['お米','0合'],['保温','7時間']],imgs:[]},share:{text:'空っぽで保温の炊飯器を、台所ごと成敗した。',tags:'#成敗 #炊飯器'}});
+STAGE_DEFS[14]=mk({seatBehind:92,seatLap:true,/* 卓の向こうで座布団にあぐら：上半身は卓より上だけ描き、卓の下にはあぐらの脚と座布団を描く */teishoku:true,scene:'火曜 12:20　定食屋（昼休み）',char:'kucharer',bg:'bg',cmp:['日替わり定食',850],mission:{t:'のれんを破る',name:'のれん'},winTitle:'静かに食べてもらった',
   script:SC('（くちゃくちゃ）','……音、気になるなぁ','（くちゃくちゃくちゃ）'),tsukkomi:['口を','閉じて','食べろ！！'],
   words:['くちゃ','くちゃくちゃ','うまっ','ずずっ','くちゃ…'],hariWords:['口閉じろ！','音や！','静かに食え！'],
   lines:{idle:['くちゃくちゃ','うまい','おかわり'],idleHurt:['……え、なに？','（静かに咀嚼）','……'],hit:['いてっ','んぐ？','え？'],knock:'ぐえっ',ret:'くちゃくちゃ',bye:'ごちそうさま',final:'……（静かに咀嚼）'},
   card:{rows:[['咀嚼音','ずっと'],['昼休み','60分']],imgs:[]},share:{text:'食べながらくちゃくちゃ話しかけてくる人を、店ごと成敗した。',tags:'#成敗 #くちゃらー'}});
-STAGE_DEFS[15]=mk({scene:'金曜 17:50　オフィスの自席',char:'sekasu',bg:'bg_office',cmp:['残業代',1500],mission:{t:'モニターを割る',name:'モニター'},winTitle:'ちゃんと、待ってもらった',
+STAGE_DEFS[15]=mk({scene:'金曜 17:40　オフィス',char:'sekasu',bg:'bg_office',cmp:['残業代',1500],mission:{t:'モニターを割る',name:'モニター'},winTitle:'ちゃんと、待ってもらった',
   script:SC('あれ、まだ？','……今やってます','まだかな〜（腕時計トントン）'),tsukkomi:['今','やってる','言うてるやろ！！'],
   words:['あれ、まだ？','急ぎでね','いつできる？','まだかな〜','5分で'],hariWords:['今やってる！','待て！','急かすな！'],
   lines:{idle:['まだ？','（腕時計を叩く）','急ぎでね'],idleHurt:['……え、なに？','（コーヒーをすする）','……あ、もうできてたのね'],hit:['いてっ','おい','なんだ'],knock:'ぐえっ',ret:'で、まだ？',bye:'お先〜',final:'……あ、もうできてたのね。'},
   card:{rows:[['締切','18:00'],['急かされた','3回']],imgs:[]},share:{text:'作業中に急かしてくる上司を、オフィスごと成敗した。',tags:'#成敗 #急かす上司'}});
-for(const n of [6,14]){const d=STAGE_DEFS[n],b=STAGE_DEFS[1];Object.assign(d,{layout:b.layout,layoutExt:b.layoutExt,table:b.table,items:b.items,tableName:'テーブル'});} // 06・14 は「まる吉」をそのまま使う
+for(const n of [6,14]){const d=STAGE_DEFS[n],b=STAGE_DEFS[1];Object.assign(d,{layout:b.layout,layoutExt:b.layoutExt,table:b.table,items:b.items,tableName:'テーブル'});}
+Object.assign(STAGE_DEFS[14],{table:Object.assign({},STAGE_DEFS[1].table,{cx:300}),items:STAGE_DEFS[1].items.filter(i=>i.key!=='jug')}); /* 14：昼の定食屋。卓は相手の前に、ビールジョッキは置かない */ // 06・14 は「まる吉」をそのまま使う
 /* 第3弾の背景の「割れる場所」と、床に置いた壊せる物（2026-11-15） */
 const G3=(n,o)=>Object.assign(STAGE_DEFS[n].layoutExt,o);
 const F=(k,x,w,h,price,name,m)=>[k,x,FLOOR-h/2,w,h,price,name,{m:m||1}];
@@ -1099,12 +1103,12 @@ G3(4,{tears:[[10,300,130,830,'鏡',40000,'glass'],[200,240,370,444,'額縁',2500
 G3(5,{tears:[[4,360,200,580,'タバコの棚',50000,'glass'],[200,410,350,620,'ホットスナックのケース',30000,'glass'],[350,420,430,620,'コーヒーマシン',25000,'glass'],[460,340,540,840,'冷蔵庫',40000,'glass'],[0,70,540,110,'蛍光灯',10000,'glass'],[50,530,150,630,'レジ',30000,'glass']],
   brk:[...pyramid('p_gum',440,36,20,4,150,'ガム'),F('p_lighter',80,16,24,300,'ライター',0.3),F('p_drink',120,26,40,250,'ドリンク',0.6)]});
 G3(9,{tears:[[84,580,244,690,'テレビ',60000,'glass'],[114,480,224,560,'額縁',15000,'glass'],[0,460,80,690,'窓',30000,'glass'],[450,390,540,540,'食器棚',40000,'glass'],[320,410,430,470,'ペンダントライト',12000,'glass'],[450,600,540,660,'電子レンジ',25000,'glass'],[0,270,120,350,'照明',15000,'glass']],
-  brk:[...pyramid('p_orange',450,26,26,4,100,'みかん'),F('p_cushion',100,48,40,2500,'クッション',0.8),F('p_icebox',160,46,30,400,'雪見だいふく',0.6)]});
+  brk:[...pyramid('p_orange',450,26,26,4,100,'みかん'),F('p_cushion',100,48,40,2500,'クッション',0.8),F('p_icebox',160,46,30,400,'2個入りアイス',0.6)]});
 G3(13,{tears:STAGE_DEFS[9].layoutExt.tears,brk:[...pyramid('p_mug',440,30,30,4,800,'マグカップ'),F('p_ricebag',260,40,50,2500,'米袋',2),F('p_shamoji',300,18,40,300,'しゃもじ',0.3),F('p_mcup',330,30,28,500,'計量カップ',0.4)]});
 G3(10,{tears:[[210,40,330,210,'ミラーボール',30000,'glass'],[20,350,344,534,'モニター',80000,'glass'],[376,366,540,500,'グラス棚',30000,'glass'],[0,254,50,330,'スピーカー',20000,'glass'],[340,254,390,340,'スピーカー',20000,'glass'],[50,180,110,240,'スポットライト',10000,'glass'],[410,180,480,240,'スポットライト',10000,'glass']],
   brk:[...pyramid('p_drink',450,26,40,4,300,'ドリンク'),F('p_tambourine',90,44,34,2500,'タンバリン',0.7),F('p_maracas',140,20,40,1500,'マラカス',0.4),F('p_mic',170,18,40,8000,'マイク',0.5)]});
-G3(11,{tears:[[0,150,50,580,'スクリーン',100000,'glass'],[110,410,170,460,'非常口の看板',15000,'glass'],[230,280,270,340,'壁の照明',10000,'glass'],[500,280,540,340,'壁の照明',10000,'glass'],[100,500,540,840,'シート',40000,'noren']],
-  brk:[...pyramid('p_popbucket',440,40,40,3,700,'ポップコーン'),F('p_drink',90,26,40,400,'ドリンク',0.6),F('p_phone',130,18,32,30000,'スマホ',0.4)]});
+G3(11,{tears:[[0,150,50,580,'スクリーン',100000,'glass'],[110,410,170,460,'非常口の看板',15000,'glass'],[230,280,270,340,'壁の照明',10000,'glass'],[500,280,540,340,'壁の照明',10000,'glass']],/* 座席は破れる布として扱わない（暗い四角が出て不自然なため） */
+  brk:[...pyramid('p_popbucket',440,40,40,3,700,'ポップコーン'),F('p_drink',90,26,40,400,'ドリンク',0.6)]});
 G3(12,{tears:[[0,290,170,840,'ガラスの壁',60000,'glass'],[20,500,140,630,'ホワイトボード',30000],[220,350,300,430,'時計',15000,'glass'],[216,450,310,570,'額縁',12000,'glass'],[360,360,540,630,'窓',40000,'glass'],[390,590,520,660,'モニター',50000,'glass'],[0,110,540,140,'蛍光灯',10000,'glass']],
   brk:[...pyramid('p_docs',430,50,32,3,500,'書類'),F('p_stapler',230,40,22,800,'ホチキス',0.5),F('p_sticky',270,30,22,300,'付箋',0.3),F('p_mug',310,30,30,800,'マグカップ',0.6)]});
 G3(15,{tears:STAGE_DEFS[12].layoutExt.tears,brk:STAGE_DEFS[12].layoutExt.brk});
@@ -1117,49 +1121,155 @@ const nY=(i,t,d)=>{const r=RD(t,d||1.4);return {npc:[i,t,r+0.15],wait:r+0.12};};
 const cY=(t,d)=>{const r=RD(t,d||1.9);return {cap:[t,r+0.1],wait:r+0.05};};
 const kY=(t,d)=>({card:[t,d||1.6],wait:(d||1.6)+0.15});
 const RW={
- 2:{punchTaunts:[[1, ["え、なに？ 怒ってる？", "まあまあ、55分じゃん"]], [4, ["ちょ、ちょっと！", "飲み物あげるから！"]], [9, ["次は！ 次はちゃんと来るから！", "アラーム3個かけるから！"]], [15, ["……で、どこ行く？"]]],startX:640,hero:{x:150,h:284,front:true},script:[kY('13:30（待ち合わせ 13:00）'),cY('（電話）友人「ごめん、いま起きた（笑）」',2.1),mY('え、13時集合だったよね？'),cY('（電話）「うん。まじごめん。いまから急いで行く！」',2.2),kY('13:55'),{walk:SERVE_X},sY('お待たせ〜。あ、飲み物買ってきた'),mY('……寄る時間あったんだ'),sY('え、怒ってる？ 55分なんて誤差じゃん（笑）',2.1,'smug',1),{cutin:true}],
-   tsukkomi:['55分待たせて','コンビニ寄って','そのテンション！？'],ochi:[sY('次は絶対早く来る！'),cY('（翌週。通知）友人「ごめん、いま起きた（笑）」',2.2),{hero:'trouble',wait:0.1},mY('（……知ってた）',1.3,'trouble')]},
- 3:{punchTaunts:[[1, ["……"]], [4, ["……！"]], [9, ["（無言で列の後ろを指さす）"]], [15, ["……"]]],startX:660,table:{none:true,cx:270,w:10,top:745},items:[],hero:{x:262,h:288},
+ 2:{punchTaunts:[[1, ["え、なに？ 怒ってる？", "まあまあ、55分じゃん"]], [4, ["待って待って！", "飲み物あげるから！"]], [9, ["次は！ 次はちゃんと来るから！", "アラーム3個かけるから！"]], [15, ["……怒ってないよね？"]]],startX:640,hero:{x:150,h:284,front:true},script:[kY('13:30（待ち合わせ 13:00）'),cY('（電話）友人「ごめん、いま起きた（笑）」',2.1),mY('え、13時集合だったよね？'),cY('（電話）「うん。まじごめん。いまから急いで行く！」',2.2),kY('13:55'),{walk:SERVE_X},sY('お待たせ〜。あ、飲み物買ってきた'),mY('……寄る時間あったんだ'),sY('え、怒ってる？ 55分なんて誤差じゃん（笑）',2.1,'smug',1),{cutin:true}],
+   tsukkomi:['55分待たせて','コンビニ寄って','そのテンション！？'],ochi:[sY('次は絶対早く来る！'),{walk:720},kY('翌週の土曜 13:30'),cY('（通知）友人「ごめん、いま起きた（笑）」',2.2),{hero:'trouble',wait:0.1},mY('（……知ってた）',1.3,'trouble')]},
+ 3:{punchTaunts:[[1, ["……"]], [4, ["……！"]], [9, ["（無言で、列のうしろをチラッと見る）"]], [15, ["……"]]],startX:660,table:{none:true,cx:270,w:10,top:745},items:[],hero:{x:262,h:288},
    npcs:[{img:'r_salary',x:396,h:306,flip:true},{img:'r_student',x:328,h:296,flip:true},{img:'r_coat',x:192,h:286,flip:true},{img:'r_elder',x:122,h:290,flip:true}],
-   script:[cY('（朝のホーム。乗車口の前に列。あなたは3番目）',2.0),{walk:458},{face:1},cY('（何も言わずに、列の一番前へ）',1.8),{react:[0,'……']},{react:[1,'えっ']},{hero:'trouble',wait:0.5},mY('（……え、今、一番前に入った？）',1.9,'trouble'),{cap:['（何事もなかったように、前を向いている）',1.8],focus:true,wait:1.9},{react:[3,'はぁ…']},{wait:0.4},{cutin:true}],
-   tsukkomi:['黙って','一番前に','入るな！！'],ochiX:458,ochiFace:1,ochiBehind:true,ochi:[{wait:0.4},nY(0,'……並んでますよ',1.6),{face:-1},cY('（無言のまま、列の一番うしろへ）',1.6),{walk:62},{hero:'normal',wait:0.2}]},
- 4:{punchTaunts:[[1,['え、何ですか？','あ、試着中ですよね？']],[4,['ちょ、ちょっと！','お客様!?']],[9,['似合ってます！ 似合ってますから！','服は！ 服は本当にいいんです！']],[15,['……無難なのも、ありますよ','（営業スマイルが崩れた）']]],startX:640,hero:{x:200,h:286,pre:'try_',flip:true},mirror:{x:14,y:252,w:106,h:566},ochiX:345,ochiFace:-1,
+   script:[cY('（朝のホーム。乗車口の前に列。あなたは3番目）',2.0),{walk:458},{face:1},cY('（後から来た人が、何も言わずに列の一番前へ）',1.8),{react:[0,'……']},{react:[1,'えっ']},{hero:'trouble',wait:0.5},mY('（……え、今、一番前に入った？）',1.9,'trouble'),{cap:['（何事もなかったように、前を向いている）',1.8],focus:true,wait:1.9},{react:[3,'はぁ…']},{wait:0.4},{cutin:true}],
+   tsukkomi:['黙って','一番前に','入るな！！'],ochiX:458,ochiFace:1,ochiBehind:true,ochi:[{wait:0.4},nY(0,'……並んでますよ',1.6),{face:-1},{walk:62},cY('（無言のまま、列の一番うしろへ）',1.6),{hero:'normal',wait:0.2}]},
+ 4:{punchTaunts:[[1,['え、何ですか？','え、お客様？']],[4,['ちょ、ちょっと！','お客様!?']],[9,['似合ってます！ 似合ってますから！','服は！ 服は本当にいいんです！']],[15,['……無難なのも、ありますよ','……お似合い、です']]],startX:640,hero:{x:200,h:286,pre:'try_',flip:true},mirror:{x:14,y:308,w:106,h:510},ochiX:345,ochiFace:-1,
    script:[cY('（日曜のセレクトショップ。気になっていた服を試着中）',2.0),{walk:345},{face:-1},mY('これ、どうですかね？',1.7,'talk'),sY('……あー',1.0,'blank'),{scan:1.4},{wait:0.5},{hflip:false},{hero:'trouble',wait:0.2},mY('……変ですか？',1.4,'trouble'),sY('いや、服はすごくいいですよ',1.7,'smile'),mY('服は……？',1.2,'trouble'),sY('これ、着こなし難しいんで。普段、こういうの着ないですよね？',2.6,'smile',1),mY('……あ、はい',1.1,'trouble'),sY('ですよね。もっと無難なのもありますよ',2.0,'smug'),{cutin:true}],
-   tsukkomi:['服の話が','いつの間にか','こっちの品評会！'],ochi:[{hflip:false},{hero:'normal',wait:0.3},mY('じゃ、別のお店も見てみます',1.8,'talk'),cY('（試着室のカーテンを、静かに閉めた）',1.8)]},
- 5:{punchTaunts:[[1, ["え、青いやつだって", "いつものだよ？"]], [4, ["ちょっ、何!?", "32番！ 32番です！"]], [9, ["番号で言います！ これからは！", "ポイントカードも出します！"]], [15, ["……あの、青いやつ"]]],startX:640,hero:{x:455,h:284,flip:true},npcs:[{img:'r_elder',x:532,h:290,flip:true}],
-   script:[cY('（深夜のコンビニ。あなたはレジ待ちの2番目）',1.9),{walk:SERVE_X},{face:-1},sY('いつもの、青い箱のやつ',1.6,'confused'),cY('店員「すみません、番号でお願いできますか？」',1.9),sY('ほら、あそこ。青いやつ',1.6,'smug'),cY('店員「青いものが何種類かございまして……」',1.9),{hero:'trouble',wait:0.2},mY('（……番号、目の前に書いてあるのに）',1.9,'trouble'),{react:[0,'……']},sY('いや、わかるでしょ？ いつも買ってんだけど',2.0,'smug',1),{cutin:true}],
-   tsukkomi:['その「いつも」','こっちは','知らん！！'],ochiFace:-1,ochi:[sY('……32番',1.2,'confused'),cY('店員「32番ですね。ありがとうございます」',1.8),{hero:'normal',wait:0.2},mY('（……最初からそれで）',1.5,'normal')]},
- 7:{punchTaunts:[[1, ["ふぅ〜……ん？", "煙？ 風のせいでしょ"]], [4, ["ちょ、ちょっと！", "灰皿、持ってる持ってる！"]], [9, ["消します！ 今消します！", "喫煙所、行きます！"]], [15, ["……風が悪いね"]]],hero:{x:120,h:284},
+   tsukkomi:['服の話が','いつの間にか','こっちの品評会！'],ochi:[{hflip:false},{hero:'normal',wait:0.3},{unpre:1},cY('（そっと、元の服に着替えた）',1.8),mY('じゃ、別のお店も見てみます',1.8,'talk')]},
+ 5:{punchTaunts:[[1, ["え、スカイ・ライトだって", "いつものだよ？"]], [4, ["ちょっ、何!?", "青いの！ 青いのです！"]], [9, ["番号で言います！ これからは！", "ポイントカードも出します！"]], [15, ["……スカイ・ライトの、青いやつ"]]],startX:-90,hero:{x:455,h:284,flip:true},npcs:[{img:'r_elder',x:532,h:290,flip:true},{img:'pp_ex_a',x:150,y:760,h:262,clipY:624,flip:true}]/* レジの奥に店員（カウンターより下は隠す） */,
+   script:[cY('（深夜のコンビニ。あなたはレジ待ちの2番目）',1.9),{walk:SERVE_X},{face:-1},sY('スカイ・ライトの、いつものやつ',1.6,'confused'),cY('店員「すみません、番号でお願いできますか？」',1.9),sY('だから、スカイ・ライト。青い箱の',1.6,'smug'),cY('店員「青いものが何種類かございまして……」',1.9),{hero:'trouble',wait:0.2},mY('（……番号、目の前に書いてあるのに）',1.9,'trouble'),{react:[0,'……']},sY('いや、わかるでしょ？ いつも買ってんだけど',2.0,'smug',1),{cutin:true}],
+   tsukkomi:['その「いつも」','店員さんは','知らん！！'],ochiFace:-1,ochi:[sY('……32番',1.2,'confused'),cY('店員「32番ですね。ありがとうございます」',1.8),{hero:'normal',wait:0.2},mY('（……最初からそれで）',1.5,'normal')]},
+ 7:{punchTaunts:[[1, ["ふぅ〜……ん？", "煙？ 風のせいでしょ"]], [4, ["ちょ、ちょっと！", "風！ 風のせいだって！"]], [9, ["消します！ 今消します！", "喫煙所、行きます！"]], [15, ["……風が悪いね"]]],hero:{x:120,h:284},
    script:[{walk:SERVE_X},sY('……ふぅ〜',1.4),mY('すみません、煙こっち来てるんで……'),sY('あ、マジ？ ごめんごめん',1.6),{walk:SERVE_X+40},cY('（一歩だけ離れて、また吸う）',1.5),sY('風が悪いね（笑）',1.7,'smug',1),{cutin:true}],
    tsukkomi:['謝るなら','煙も','止めてくれ！！'],ochi:[sY('あ、ここ路上禁煙だった？',1.8,'confused'),cY('（あわてて携帯灰皿を出す）',1.6),mY('（……持ってたんかい）',1.4,'trouble')]},
- 8:{punchTaunts:[[1, ["飲みですか？ 一軒目？", "あ、話だけでも！"]], [4, ["ちょっ、お兄さん!?", "飲み放題つけますよ!?"]], [9, ["どうぞ、お通りください！", "もう声かけません！"]], [15, ["……二軒目は？"]]],hero:{x:140,h:284},script:[{walk:420},sY('飲みですか？ いい店ありますよ'),mY('いえ、大丈夫です',1.3),{walk:360},sY('1軒目？ 2軒目？ あ、食事だけでも！'),mY('本当に大丈夫なんで',1.4),{walk:250},{face:1},sY('あ、じゃあ逆に何探してるんですか？',1.9,'smug',1),mY('……まっすぐ家に帰る道です',1.6,'trouble'),{cutin:true}],
-   tsukkomi:['断ったのに','横移動で','ずっといる！！'],ochi:[sY('じゃ、次の人いきます！',1.6),{walk:640},{walk:SERVE_X},sY('飲みですか？',1.4,'smug')]},
- 9:{punchTaunts:[[1, ["え、一個だけだよ？", "二個あるじゃん"]], [4, ["ちょっ、スプーン置くから！", "わかった、わかった！"]], [9, ["ピノ買ってくる！ 箱で！", "二個とも食べて！ どうぞ！"]], [15, ["……一口だけ"]]],table:{cx:150,w:210,top:745},mochi:{x:178},hero:{x:84,h:282},
-   script:[cY('（土曜の夜。ずっと楽しみにしてた雪見だいふく）',1.9),{inset:1.7,label:'2個入り'},{walk:SERVE_X},{face:-1},sY('あ、それ一個ちょうだい',1.6,'smile'),mY('今日は、二個とも食べたいんだ',1.7,'talk'),sY('え、二個あるじゃん',1.5,'confused'),mY('……うん、二個入りを買ったからね',1.7,'trouble'),sY('一人で二個食べるの？',1.7,'smug',1),cY('（当たり前のように、スプーンを手に取った）',1.6),{inset:1.4,label:'私の2個'},{cutin:true}],
-   tsukkomi:['二個あるから','二個とも','食べたいの！'],ochi:[{hero:'normal',wait:0.3},mY('ごめん、今日はあげない',1.6,'talk'),sY('……そっか',1.2,'confused'),cY('（スプーンを置いた。ゆっくり一口目を食べる）',1.9)]},
- 10:{punchTaunts:[[1, ["♪〜〜（上ハモ）", "え、いい感じじゃない？"]], [4, ["ちょ、マイク！", "下ハモにする！"]], [9, ["手拍子する！ 手拍子だけ！", "ソロどうぞ！ ソロ！"]], [15, ["……♪〜（小声）"]]],hero:{x:140,h:284},script:[cY('（自分の十八番。気持ちよくサビに入った）',1.7),{walk:SERVE_X},sY('♪〜〜（重ねてくる）',1.6,'bow'),mY('ごめん、この曲は一人で歌いたい',1.8,'talk'),sY('え、俺のハモリ、邪魔？',1.6,'confused'),mY('……うん、この曲だけは',1.5,'trouble'),sY('じゃ、次は下で入るわ',1.8,'smug',1),cY('（またマイクを上げた）',1.3),{cutin:true}],
+ 8:{punchTaunts:[[1, ["飲みですか？ 一軒目？", "あ、話だけでも！"]], [4, ["ちょっ、お兄さん!?", "飲み放題つけますよ!?"]], [9, ["どうぞ、お通りください！", "もう声かけません！"]], [15, ["……二軒目は？"]]],hero:{x:140,h:284},script:[{walk:420},sY('飲みですか？ いい店ありますよ'),mY('いえ、大丈夫です',1.3),{walk:360},sY('一軒目？ 二軒目？ あ、食事だけでも！'),mY('本当に大丈夫なんで',1.4),{walk:250},{face:1},sY('あ、じゃあ逆に何探してるんですか？',1.9,'smug',1),mY('……まっすぐ家に帰る道です',1.6,'trouble'),{cutin:true}],
+   tsukkomi:['断ったのに','横移動で','ずっといる！！'],ochi:[sY('じゃ、次の人いきます！',1.6),{walk:640},{walk:SERVE_X},sY('飲みですか？',1.4,'smug'),mY('（……戻ってきた）',1.4,'trouble')]},
+ 9:{punchTaunts:[[1, ["え、一個だけだよ？", "二個あるじゃん"]], [4, ["ちょっ、手、引っこめるから！", "わかった、わかった！"]], [9, ["ピノ買ってくる！ 箱で！", "二個とも食べて！ どうぞ！"]], [15, ["……一口だけ"]]],table:{cx:150,w:210,top:745},mochi:{x:178},hero:{x:84,h:282},
+   script:[cY('（土曜の夜。お風呂上がりに、取っておいた2個入りアイス）',1.9),{inset:1.7,label:'二個入り'},{walk:SERVE_X},{face:-1},sY('あ、それ一個ちょうだい',1.6,'smile'),mY('今日は、二個とも食べたいんだ',1.7,'talk'),sY('え、二個あるじゃん',1.5,'confused'),mY('……うん、二個入りを買ったからね',1.7,'trouble'),sY('一人で二個食べるの？',1.7,'smug',1),cY('（当たり前のように、もらう気でいる）',1.6),{inset:1.4,label:'私の二個'},{cutin:true}],
+   tsukkomi:['二個あるから','二個とも','食べたいの！'],ochi:[{hero:'normal',wait:0.3},mY('ごめん、今日はあげない',1.6,'talk'),sY('……そっか',1.2,'confused'),cY('（同居人は手を引っこめた。……いただきます）',1.9)]},
+ 10:{punchTaunts:[[1, ["♪〜〜（上ハモ）", "え、いい感じじゃない？"]], [4, ["ちょ、マイク！", "下ハモにする！"]], [9, ["ソロ、聴いてます！", "ソロどうぞ！ ソロ！"]], [15, ["……♪〜（小声）"]]],hero:{x:140,h:284},script:[cY('（自分の十八番。気持ちよくサビに入った）',1.7),{walk:SERVE_X},sY('♪〜〜（重ねてくる）',1.6,'bow'),mY('ごめん、この曲は一人で歌いたい',1.8,'talk'),sY('え、ハモリ、邪魔？',1.6,'confused'),mY('……うん、この曲だけは',1.5,'trouble'),sY('じゃ、次は下で入るわ',1.8,'smug',1),cY('（また歌いはじめた）',1.3),{cutin:true}],
    tsukkomi:['上か下かの','話じゃ','ないんよ！'],ochi:[mY('この一曲だけ、ソロ！',1.5,'talk'),sY('わかった、手拍子する',1.5,'smile'),cY('（マイクを置いて、手拍子を始めた）',1.7)]},
- 11:{punchTaunts:[[1, ["すぐ返すんで", "あと1件だけ"]], [4, ["ちょっ、暗い暗い！", "画面、暗くしたから！"]], [9, ["電源切ります！ 切りました！", "機内モード！ 機内モード！"]], [15, ["……（腕時計が光る）"]]],thumbT:7.6,startX:400,sit:{x:400,y:700},hero:{x:236,y:712,h:284,sh:205,f:0.6,seat:true,footY:792},
-   script:[cY('（上映中。暗い客席）',1.5),{glow:1},mY('……まぶしっ',1.2),{glow:0,wait:1.6},{glow:1},mY('すみません、画面がちょっと……'),sY('ごめんなさい、すぐ返すんで',1.7),{glow:2},cY('（画面が、さらに明るくなった）',1.6),{focus:true,wait:0.6},{cutin:true}],
-   tsukkomi:['その「すぐ」が','ずっと','まぶしい！！'],ochi:[{glow:1},sY('あと1件だけ……',1.6),{glow:0},cY('（スマホが暗くなる。今度は腕時計が光る）',2.0)]},
- 12:{punchTaunts:[[1, ["俺が若い頃はな", "まあ聞けって"]], [4, ["ちょ、今いいとこ！", "ここからが本題で！"]], [9, ["議題に戻ろう！ な！", "その話は、また今度！"]], [15, ["……前にも話したっけ"]]],hero:{x:222,h:284},npcs:[{img:'r_salary',x:52,h:306},{img:'r_coat',x:134,h:286}],
+ 11:{punchTaunts:[[1, ["すぐ返信するんで", "これ返したら消すんで"]], [4, ["ちょっ、暗い暗い！", "画面、暗くしたから！"]], [9, ["暗くします！ 暗くしました！", "機内モード！ 機内モード！"]], [15, ["……（画面を伏せる）"]]],startX:400,sit:{x:400,y:700},staffSit:['npc_pp_sumaho_sit','npc_pp_sumaho_sit',270,820,270],/* 上映中は座っている（全身1枚の絵は脚を曲げられないので、座った絵で描く） */hero:{x:236,y:712,h:284,sh:270,f:0.6,seat:true,footY:792},
+   script:[cY('（上映中。暗い客席）',1.5),{glow:1},mY('……まぶしっ',1.2),{glow:0,wait:1.6},{glow:1},mY('すみません、画面がちょっと……'),sY('ごめんなさい、すぐ返信するんで',1.7),{glow:2},cY('（画面が、さらに明るくなった）',1.6),{focus:true,wait:0.6},{cutin:true}],
+   tsukkomi:['その「すぐ」が','ずっと','まぶしい！！'],ochi:[{glow:1},sY('あと1件だけ……',1.6),{glow:'w'},cY('（画面を伏せた。……今度は腕時計が光った）',2.0)]},
+ 12:{punchTaunts:[[1, ["俺が若い頃はな", "まあ聞けって"]], [4, ["ちょ、今いいとこ！", "ここからが本題で！"]], [9, ["議題に戻ろう！ な！", "その話は、また今度！"]], [15, ["……で、どこまで話したっけ"]]],hero:{x:222,h:284},npcs:[{img:'r_salary',x:52,h:306},{img:'r_coat',x:134,h:286}],
    script:[kY('10:00 会議'),{walk:SERVE_X+40},sY('俺が入社したての頃、これと似た案件があってさ',2.2),nY(1,'……始まった',1.2),sY('その時、俺ひとりで何とかしたんだよ',1.9,'smug'),mY('すみません、今日の締切の件なんですけど'),sY('いや、これ聞いてからのほうが分かるって',2.0,'smug',1),cY('（先週も、先々週も、同じ話）',1.6),{cutin:true}],
    tsukkomi:['同じ話が','会議より','長い！！'],ochiX:SERVE_X+40,ochi:[sY('この話、前にしたっけ？',1.8,'confused'),{react:[0,'（うん）']},{react:[1,'（うん）']},cY('（全員、一斉にうなずく）',1.8)]},
- 13:{thumbT:13.4,hero:{x:130,h:284},script:[cY('（夕食の準備中。炊飯器を開けると、釜は空っぽ）',2.0),mY('ねえ、これ空っぽなのに保温ついてる'),{walk:SERVE_X},sY('え？ そうなの？',1.4,'confused'),mY('お昼、最後に食べたよね？'),sY('あー、うん。あとで切ろうと思ってた',1.9),cY('（スマホから、目を離さない）',1.4),mY('……あとで、っていつ？',1.4),sY('え、今やらなきゃダメ？',1.7,'smug',1),{cutin:true}],
+ 13:{hero:{x:130,h:284},script:[cY('（夕食の準備中。炊飯器を開けると、釜は空っぽ）',2.0),mY('ねえ、これ空っぽなのに保温ついてる'),{walk:SERVE_X},sY('え？ そうなの？',1.4,'confused'),mY('お昼、最後に食べたよね？'),sY('あー、うん。あとで切ろうと思ってた',1.9),cY('（返事だけで、こっちを見ない）',1.4),mY('……あとで、っていつ？',1.4),sY('え、今やらなきゃダメ？',1.7,'smug',1),{cutin:true}],
    tsukkomi:['保温してるの','米じゃなくて','空気！！'],ochi:[sY('じゃ今から炊こうか？',1.6),mY('……炊けるの、50分後だけどね',1.7,'trouble'),cY('（おかずだけが、冷めていく）',1.6)]},
- 15:{punchTaunts:[[1, ["まだかな〜", "急かしてないけど"]], [4, ["ちょ、ちょっと！", "18時でいい！ 18時で！"]], [9, ["確認は明日でいい！", "席に戻ります！"]], [15, ["……了解"]]],hero:{x:140,h:284},script:[kY('17:50'),{walk:SERVE_X},sY('例の資料、いつ出る？',1.6),mY('18時に送れます',1.5,'talk'),kY('17:52',1.2),sY('まだ？ できてるところだけでも先に送れない？',2.2,'smug'),mY('……あと8分です',1.3,'trouble'),sY('急かしてないけど、急いでね',1.9,'smug',1),cY('（カーソルが、止まった）',1.3),{cutin:true}],
+ 15:{punchTaunts:[[1, ["まだかな〜", "急かしてないけど"]], [4, ["ちょ、ちょっと！", "18時でいい！ 18時で！"]], [9, ["確認は明日でいい！", "席に戻ります！"]], [15, ["……席、戻ります"]]],hero:{x:140,h:284},script:[kY('17:50'),{walk:SERVE_X},sY('例の資料、いつ出る？',1.6),mY('18時に送れます',1.5,'talk'),kY('17:52',1.2),sY('まだ？ できてるところだけでも先に送れない？',2.2,'smug'),mY('……あと8分です',1.3,'trouble'),sY('急かしてないけど、急いでね',1.9,'smug',1),cY('（言い返す言葉を、飲み込んだ）',1.3),{cutin:true}],
    tsukkomi:['その確認の','2分の間も','作業してたの！'],ochi:[mY('18時で間に合います。最後まで確認させてください',2.2,'talk'),sY('……了解',1.2,'confused'),cY('（18:00ちょうど、送信）',1.6)]},
- 16:{punchTaunts:[[1, ["ん？ 空いてるでしょ", "そっち座れば？"]], [4, ["ちょっ、何!?", "足、長いもんで…"]], [9, ["閉じます！ 膝閉じます！", "どうぞ！ 座ってください！"]], [15, ["……普通じゃない？"]]],startX:300,staffSit:['npc_pp_omata_spread','npc_pp_omata_closed',300,836,270],sit:{x:300,y:590,spread:true},hero:{x:150,h:284,front:true},
+ 16:{punchTaunts:[[1, ["ん？ なんか用？", "立ってればいいじゃん"]], [4, ["ちょっ、何!?", "足、長いもんで…"]], [9, ["引きます！ 足引きます！", "どうぞ！ 座ってください！"]], [15, ["……足、引きます"]]],startX:300,staffSit:['npc_pp_omata_knees','npc_pp_omata_closed4',218,768,250,768]/* 膝を大きく開いて座る → 膝を閉じて座る */,sit:{x:300,y:590,spread:true},hero:{x:150,h:284,front:true},
    npcs:[{img:'r_elder',x:530,h:290,flip:true},{img:'r_salary',x:42,h:306},{img:'r_seat',x:440,y:768,h:200,full:true,squeeze:true}],
-   script:[cY('（木曜の夜。帰りの電車は、座席がほぼ埋まっている）',1.9),{react:[2,'……（せまい）']},{hero:'normal',wait:0.4},mY('あの、すみません、少し詰めてもらっても……',1.9,'talk'),sY('ん？ そっち空いてるでしょ',1.6,'smug'),mY('……いや、足を少し閉じてもらえれば',1.7,'talk'),sY('え、これ普通じゃない？',1.9,'smug',1),{react:[0,'……']},{hero:'trouble',wait:0.2},cY('（隣の人は、ずっと縮こまっている）',1.5),{cutin:true}],
-   tsukkomi:['そこ','一人分の','席です！！'],ochi:[{wait:0.3},sY('……あ、こんなに広げてた？',1.8,'surprised'),{closeLegs:1,wait:0.5},cY('（膝を閉じると、空席がひとつ現れた）',2.0),{react:[2,'ふぅ……']},mY('……どうも',1.1,'normal')]},
- 6:{punchTaunts:[[1, ["ん？ 何？", "ちょっとお兄さん、こっち"]], [4, ["え、ちょっと！", "融通きかないなぁ!?"]], [9, ["塩でいい！ 塩でいいから！", "注文し直します！ 自分で！"]], [15, ["……タレ、別注文で"]]],hero:{x:64,h:280},restArm:[-2.4,-2.9],hideFarArm:true,script:[cY('（金曜の夜。隣の卓の客が、手だけ上げて店員さんを呼ぶ）',2.0),{walk:SERVE_X},{face:-1},sY('ねえ、お兄さん。これさ、タレにしてよ',1.9,'smug'),cY('店員「ご注文は塩でお受けしてまして……」',1.8),sY('いや、分かってるよ。食べたら気が変わったの',2.0,'smug'),cY('（皿の焼き鳥は、もう半分ない）',1.5),{hero:'trouble',wait:0.2},cY('店員「新しくご注文いただく形でしたら……」',1.9),sY('え、だから作り直してって。融通きかないなぁ',2.2,'smug',1),{cutin:true}],
-   tsukkomi:['自分で頼んで','半分食べて','その態度！？'],ochi:[cY('店員「申し訳ありません、別のご注文になります」',1.9),sY('……あっそ。じゃ、このままでいいわ',1.8,'confused'),{hero:'normal',wait:0.2},cY('（店員さんに、そっと会釈した）',1.6)]},
- 14:{punchTaunts:[[1, ["（くちゃ）ここ初めて？", "うまいよ（くちゃ）"]], [4, ["ちょっ、むせる！", "（ごくん）え、何!?"]], [9, ["口閉じる！ 閉じるから！", "静かに食べます！"]], [15, ["……（ズゾゾッ）"]]],hero:{x:64,h:280},script:[cY('（平日のランチ。静かに食べたい）',1.7),{walk:SERVE_X},{face:-1},cY('（くちゃ……くちゃ……）',1.4),sY('ねえ、ここ初めて？（くちゃくちゃ）',1.8,'smile'),{hero:'trouble',wait:0.2},mY('……あ、はい',1.1,'trouble'),sY('この唐揚げ定食がさ、（くちゃ）うまいんだよ（くちゃ）',2.1,'smug'),cY('（しゃべるたびに、口の中が見える）',1.6),mY('……そうなんですね',1.2,'trouble'),sY('食べないの？ 冷めるよ？（くちゃくちゃくちゃ）',2.0,'smile',1),{cutin:true}],
+   script:[cY('（木曜の夜。帰りの電車は、座席がほぼ埋まっている）',1.9),{react:[2,'……（せまい）']},{hero:'normal',wait:0.4},mY('あの、すみません、少し詰めてもらっても……',1.9,'talk'),sY('ん？ 立ってれば、すぐ着くでしょ',1.6,'smug'),mY('……いや、足を少し引いてもらえれば',1.7,'talk'),sY('え、これ普通じゃない？',1.9,'smug',1),{react:[0,'……']},{hero:'trouble',wait:0.2},cY('（隣の人は、ずっと縮こまっている）',1.5),{cutin:true}],
+   tsukkomi:['そこ','一人分の','席です！！'],ochi:[{wait:0.3},sY('……あ、こんなに伸ばしてた？',1.8,'surprised'),{closeLegs:1,wait:0.5},cY('（足を引っこめると、空席がひとつ現れた）',2.0),{react:[2,'ふぅ……']},mY('……どうも',1.1,'normal')]},
+ 6:{punchTaunts:[[1, ["ん？ 何？", "ちょっとお兄さん、こっち"]], [4, ["え、ちょっと！", "塩、塩でいいです！"]], [9, ["塩でいい！ 塩でいいから！", "注文し直します！ 自分で！"]], [15, ["……塩で、いいです"]]],hero:{x:64,h:280},npcs:[{img:'pp_ex_d',x:478,h:282,flip:true}],/* 店員（呼ばれて来る人）を右端に */restArm:[-2.4,-2.9],hideFarArm:true,script:[cY('（金曜の夜。隣の席の客が、手だけ上げて店員さんを呼ぶ）',2.0),{walk:SERVE_X},{face:-1},sY('ねえ、お兄さん。これさ、タレにしてよ',1.9,'smug'),cY('店員「ご注文はこちら、塩でご注文いただいてまして……」',1.8),sY('いや、分かってるよ。食べたら気が変わったの',2.0,'smug'),cY('（皿の焼き鳥は、もう半分ない）',1.5),{hero:'trouble',wait:0.2},cY('店員「新しくご注文いただく形でしたら……」',1.9),sY('え、だから作り直してって。融通きかないなぁ',2.2,'smug',1),{cutin:true}],
+   tsukkomi:['自分で頼んで','半分食べて','その態度！？'],ochi:[cY('店員「申し訳ありません、別のご注文になります」',1.9),sY('……あっそ。じゃ、このままでいいわ',1.8,'confused'),{hero:'normal',wait:0.2},cY('（あなたは、店員さんにそっと会釈した）',1.6)]},
+ 14:{punchTaunts:[[1, ["（くちゃ）え、なに急に？", "うまいよ（くちゃ）"]], [4, ["ちょっ、むせる！", "（ごくん）え、何!?"]], [9, ["口閉じる！ 閉じるから！", "静かに食べます！"]], [15, ["……（もぐ…）"]]],hero:{x:64,h:280},script:[cY('（平日のランチ。静かに食べたい）',1.7),{walk:SERVE_X},{face:-1},cY('（くちゃ……くちゃ……）',1.4),sY('ねえ、ここ初めて？（くちゃくちゃ）',1.8,'smile'),{hero:'trouble',wait:0.2},mY('……あ、はい',1.1,'trouble'),sY('この唐揚げ定食がさ、（くちゃ）うまいんだよ（くちゃ）',2.1,'smug'),cY('（しゃべるたびに、口の中が見える）',1.6),mY('……そうなんですね',1.2,'trouble'),sY('食べないの？ 冷めるよ？（くちゃくちゃくちゃ）',2.0,'smile',1),{cutin:true}],
    tsukkomi:['食べながら','しゃべるなら','口を閉じて！！'],ochi:[sY('……あ、ごめん。音、出てた？',1.7,'confused'),cY('（口を閉じて、静かに食べはじめた）',1.6),cY('（……ズゾゾゾッ。今度は味噌汁）',1.8),{hero:'trouble',wait:0.1},mY('（……そっちもか）',1.3,'trouble')]}
 };
-RW[1]=Object.assign(RW[1]||{},{hero:{x:64,h:280},punchTaunts:[[1, ["え、お通しですよ？", "あ、おかわりは別料金で…"]], [4, ["ちょっ、店内では！", "お客様!?"]], [9, ["ポップコーン、サービスしますから！", "440円は、決まりで…！"]], [15, ["……塩とキャラメル、どっちにします？"]]]});
+RW[1]=Object.assign(RW[1]||{},{hero:{x:64,h:280},punchTaunts:[[1, ["え、お通しですよ？", "あ、おかわりは別料金で…"]], [4, ["ちょっ、何するんですか！", "お客様!?"]], [9, ["ポップコーン、サービスしますから！", "600円は、決まりで…！"]], [15, ["……塩とキャラメル、どっちにします？"]]]});
 for(const k in RW)Object.assign(STAGE_DEFS[k],RW[k]);
+/* ===== v5 脚本（2026-11-18 承認稿「脚本改稿とUI差分 v2」）。配置（人物の位置など）は上の設定のまま、台本・台詞・結末・称号だけを差し替える ===== */
+const PT=(a,b,c,d)=>[[1,a],[3,b],[6,c],[10,d]];
+const V5={
+ 1:{tsukkomi:['ポップコーンで','600円！？'],
+   punchTaunts:PT(['塩とキャラメル、どっちにします？'],['伝票が！'],['ポップコーンが弾けてる！ 店内で！'],['（ポップコーンまみれで）……お通し、です……']),
+   lines:{serve:'お通しでーす',me:'あ……ポップコーン、ですか？',charge:'はい、うちのお通しで。お一人600円です',me2:'600円……。メニューに書いてありました？',charge2:'あー、お席代みたいなものなんでー',
+     idle:['ごゆっくりどうぞ〜','キャラメルと塩、ハーフ＆ハーフです','ご注文お決まりですか？'],idleHurt:['……え？','（伝票で顔を隠す）','……何か？'],ret:'お待たせしましたー',bye:'ありがとうございましたー',hit:['いてっ','え、なに？','は？'],final:'……ポンッ（最後の1粒が弾ける）'},
+   slip:{title:'御会計',item:'お通し',price:'600円',note:'（ポップコーン）',hand:'¥600'},
+   ochi:[mY('すみません、このお通しの説明って、どこかにありました？',2.4,'talk'),sY('あ……ちょっと確認してきますね',1.6,'confused'),{walk:520},{wait:0.5},{walk:SERVE_X},sY('メニューに書いてなかったので、今回はお通し代、外しておきますね',2.6,'bow'),
+     {note:{style:'receipt',title:'御会計',rows:[['生ビール','550円'],['お通し','600円',1],['合計','550円']]},wait:2.6},mY('（……ポップコーン自体は、普通においしかった）',1.9)],
+   winTitle:'伝票から、600円が消えた',share:{text:'お通しのポップコーンで600円。脳内で成敗してから、ちゃんと聞いてみた。'},card:[['お通し','ポップコーン'],['お値段','600円']]},
+ 2:{script:[kY('13:30（待ち合わせ 13:00）'),cY('（電話）友人「ごめん、いま起きた！ すぐ行く！」',2.1),kY('13:55'),{walk:SERVE_X},sY('おまたせ〜！ いや〜、電車ちょうど行っちゃってさ',2.1),mY('……55分だよ',1.3,'trouble'),sY('まあまあ、誤差じゃん誤差（笑） あ、コンビニでおにぎり買ってきた。食べる？',2.6,'smug',1),{cutin:true}],
+   tsukkomi:['55分を','誤差にすな！！'],
+   punchTaunts:PT(['え、まだ怒ってる？（笑）'],['おにぎりが！'],['ツナマヨ！ ツナマヨの具が出た！'],['（回転しながら）……ごさ、ごさ……']),
+   lines:{idle:['あ、ここのラーメン気になってたんだよね','おにぎり、食べる？','ちょっとトイレ行っていい？'],idleHurt:['……え、怒ってる？','（スマホを見る）','……ごさ？'],ret:'いや〜、電車がさ',bye:'じゃ、行こっか',hit:['いてっ','え、なに？','ちょ、なんで？'],final:'……13時、55分……'},
+   holdProp:{key:'p_paperbag',w:26,h:30,dx:-34,dy:66,ph:['intro','ochi']},
+   ochi:[{hero:'normal',wait:0.2},mY('13時ちょうどに「着いたよ」って送ってるよ',2.0,'talk'),{note:{style:'phone',title:'トーク',rows:[['13:00','着いたよ'],['13:20','まだかな？'],['13:31','いま起きた！ すぐ行く！']]},wait:2.6},sY('……うわ、ほんとだ。55分も立たせてたのか……',2.1,'confused'),sY('次は絶対早く来る！',1.6,'smile')],
+   winTitle:'55分、誤差じゃなくした',share:{text:'55分遅れて「誤差じゃん」と笑う友達を、脳内で成敗した。'},card:[['待ち合わせ','13:00'],['到着','13:55']]},
+ 3:{script:[cY('（朝のホーム。乗車口の前に5人の列。あなたは3番目）',2.0),{walk:458},{face:1},{cap:['（後から来た人が、列の横をすり抜けて先頭に立つ）',1.9],wait:2.0},{hero:'trouble',wait:0.3},mY('（小声で）……あの、並んでますよ',1.7,'trouble'),{cap:['（イヤホンを押さえて、聞こえないふり）',1.9],wait:2.0,thumb:true},{react:[0,'……え？']},{focus:true,wait:1.2},{cutin:true}],
+   tsukkomi:['列、','見えてるよな！？'],
+   punchTaunts:PT(['（イヤホンを押さえたまま）……'],['……！？'],['（イヤホンだけは外さない）'],['（無言のまま、くるくる回る）']),
+   lines:{idle:['（イヤホンを押さえる）','（スマホを見る）','……'],idleHurt:['……！？','（目をそらす）','……'],ret:'……（無言）',bye:'……（無言で乗り込む）',hit:['……！','……っ','（無言）'],final:'……（無言）'},
+   ochi:[{wait:0.3},nY(0,'すみません、並んでますよ。最後尾、あっちです',2.1),{react:[1]},{react:[2]},{react:[3]},{wait:0.9},{face:-1},{walk:62},{hero:'normal',wait:0.2},mY('（……電車、来た）',1.4)],
+   winTitle:'視線だけで、最後尾へ',share:{text:'列の横をすり抜けて先頭に立つ人を、脳内で成敗した。'},card:[['並んだ時間','12分'],['割り込み','3秒']]},
+ 4:{script:[cY('（日曜のセレクトショップ。気になっていた服を試着中）',2.0),{walk:345},{face:-1},mY('これ、どうですかね？',1.4,'talk'),sY('あー、いいと思いますよ。……ただ、ちょっと上級者向けかもですね',2.5,'smile'),{scan:1.4},{wait:0.4},{hflip:false},{hero:'trouble',wait:0.2},mY('上級者向け……',1.3,'trouble'),sY('普段は、もっとシンプルな感じですよね？ でしたら、こっちのベーシックなのも',2.7,'smug',1),{cutin:true}],
+   tsukkomi:['普段の私、','知らんやろ！！'],
+   punchTaunts:PT(['お客様、そちらは上級者向けで……'],['わっ！'],['ベーシック！ ベーシックが飛んでった！'],['（マネキンと同じポーズのまま回転）']),
+   lines:{idle:['（腕を組む）','何かお探しですか？','そちら、上級者向けで'],idleHurt:['……え？','（目をそらす）','……ベーシック、ありますよ'],ret:'ご試着、いかがでした？',bye:'ありがとうございました〜',hit:['いてっ','え？','わっ'],final:'……お似合い、です……'},
+   ochi:[{hflip:false},{hero:'normal',wait:0.3},mY('……いえ。やっぱり、これがいいです',1.9,'talk'),sY('あ……はい',1.0,'confused'),cY('（気になっていた服を持って、レジへ向かった）',1.9),mY('（……着たいから、着る）',1.5)],
+   winTitle:'着たい服は、自分で決めた',share:{text:'試着中に「普段はシンプルな感じですよね？」と言われて、脳内で成敗した。'},card:[['試着','1着'],['「上級者向け」','1回']]},
+ 5:{script:[cY('（深夜のコンビニ。レジには5人の列。あなたは2番目）',2.0),{walk:SERVE_X},{face:-1},sY('スカイ・ライトのメンソール、ワンミリのやつ',2.0),nY(1,'すみません、こちらの番号で言っていただけますか？',2.1),sY('（スマホを見たまま）いや、言ってんじゃん。スカイ・ライト',2.2,'smug'),nY(1,'スカイ・ライトのメンソールが、3種類ありまして……',2.1),sY('はぁ……それくらい覚えといてよ',1.8,'smug',1),{hero:'trouble',wait:0.2},mY('（……後ろ、まだ4人いるんだけど）',1.7,'trouble'),{cutin:true}],
+   tsukkomi:['番号、','目の前やろ！！'],
+   punchTaunts:PT(['だから、スカイ・ライトだって'],['うおっ！？'],['小銭！ 小銭がレジ台に散らばった！'],['（回転しながら）……ワン、ミリ……']),
+   lines:{idle:['まだ？','（スマホを見る）','スカイ・ライトだって'],idleHurt:['……は？','（舌打ち）','……32番'],ret:'早くしてよ',bye:'どうも',hit:['いてっ','は？','え、なに？'],final:'……32、ばん……'},
+   ochi:[nY(1,'こちらの3つ、どれでしょう？',1.8),{note:{style:'shelf',title:'スカイ・ライト メンソール',rows:[['31番','5mg'],['32番','1mg'],['33番','ロング']]},wait:2.2},sY('……（ポケットの空き箱を見比べて）……これ',2.0,'confused'),nY(1,'32番ですね。ありがとうございます',1.7),{hero:'normal',wait:0.2},mY('（……店員さん、強い）',1.4)],
+   winTitle:'店員さんの、完全勝利',share:{text:'番号でお願いされても協力しない客を、脳内で成敗した。'},card:[['番号','32番'],['ため息','1回']]},
+ 6:{script:[cY('（金曜の夜。隣の席の客が、指で店員さんを呼ぶ）',2.0),{walk:SERVE_X},{face:-1},sY('ねえ、これタレに変えてくんない？',1.8,'smug'),nY(0,'こちら塩でご注文いただいておりまして……',2.0),sY('うん、だから今からタレにしてって',1.8,'smug'),cY('（皿の焼き鳥は、もう半分ない）',1.6),{hero:'trouble',wait:0.2},nY(0,'お作り直しは、新しいご注文になってしまうんですが……',2.2),sY('え、そこ融通きかせるとこじゃない？ 常連なんだけど',2.4,'smug',1),{cutin:true}],
+   tsukkomi:['常連なら','知っとけや！！'],
+   punchTaunts:PT(['常連なんだけど？'],['ぬおっ！'],['タレ！ タレが飛ぶ！'],['（ジョッキを持ったまま回転）……しお、で……']),
+   lines:{idle:['ねえ、ちょっと','（ビールを飲む）','常連なんだけど'],idleHurt:['……え？','（ジョッキを置く）','……タレ'],ret:'ねえ、会計',bye:'ごちそうさま',hit:['いてっ','は？','なんだよ'],final:'……タレ、一本……'},
+   ochi:[nY(0,'新しくタレでご注文いただければ、すぐお焼きしますよ',2.2),sY('……じゃあ、タレで1本、お願いします',1.9,'confused'),nY(0,'はい、タレ一本！',1.3),cY('（隣の客は、残りの塩も黙って食べはじめた）',1.9),{hero:'normal',wait:0.2},mY('（……最初からそれで）',1.4)],
+   winTitle:'「お願いします」を言わせた',share:{text:'半分食べてから「常連なんだけど」と言う客を、脳内で成敗した。'},card:[['注文','焼き鳥（塩）'],['「常連なんだけど」','1回']]},
+ 7:{script:[cY('（夜の繁華街。足元に「路上喫煙禁止」のマーク）',2.0),{walk:SERVE_X},sY('……ふぅ〜',1.0),mY('……ケホッ',0.9,'trouble'),sY('（ちらっと見て）あ、ごめんごめん',1.6),{walk:345},cY('（半歩ずれて、また吸う）',1.4),sY('風がそっち行っちゃうんだよね〜',1.8,'smug',1),{cutin:true}],
+   tsukkomi:['ずれるんちゃう、','消すんや！！'],
+   punchTaunts:PT(['風のせいだって〜'],['あちっ！'],['サングラス！ サングラスどこ行った！'],['（煙の輪を吐きながら回転）']),
+   lines:{idle:['ふぅ〜','（タバコをくわえる）','（スマホを見ながら吸う）'],idleHurt:['……え、なに？','（舌打ち）','……ふぅ'],ret:'あ、まだいたの？',bye:'じゃ、おつかれ〜',hit:['いてっ','あちっ','は？'],final:'……けむい……'},
+   holdProp:{key:'p_ashtray',w:24,h:16,dx:-24,dy:30,ph:['ochi'],after:4.2},
+   ochi:[{wait:0.4},nY(0,'すみませーん、この通り禁煙なんです。喫煙所、角を曲がったとこにありますよ',2.6),sY('あ、そうなんすか。……どうも',1.6,'confused'),cY('（携帯灰皿で火を消して、角の喫煙所へ歩いていった）',2.0),{walk:640},{hero:'normal',wait:0.2},mY('（……空気、戻った）',1.4)],
+   npcs:[{img:'pp_ex_c',x:468,h:282,flip:true,only:'ochi'}],
+   winTitle:'通りの空気、取り戻した',share:{text:'路上禁煙の通りで、煙をこっちに流す人を、脳内で成敗した。'},card:[['この通り','路上喫煙禁止'],['ずれた距離','半歩']]},
+ 8:{script:[{walk:420},sY('お疲れさまでーす！ もう一軒どうですか？',1.9),mY('いえ、帰るんで',1.2),{walk:330},sY('駅まで一緒っすよね？ 歩きながらでいいんで！',2.0),sY('今日だけ、生ビール190円なんすよ。190円！',1.9),mY('……飲まないんで',1.2,'trouble'),{walk:240},{face:1},sY('じゃあソフドリでも！ 席だけ見ていきません？ すぐそこなんで！',2.5,'smug',1),{cutin:true}],
+   tsukkomi:['帰り道を','ふさぐな！！'],
+   punchTaunts:PT(['190円っすよ！'],['おわっ！'],['チラシ！ チラシの束が！'],['（チラシをまき散らしながら回転）……ソフドリ、でも……']),
+   lines:{idle:['もう一軒どうですか〜','生ビール190円っす','席だけでも！'],idleHurt:['……え、なんで？','（看板を直す）','……ソフドリ、でも'],ret:'席だけ！ 席だけ見ていきません？',bye:'また今度〜',hit:['いてっ','え、なに？','ちょっ'],final:'……席だけ、でも……'},
+   ochi:[{hero:'normal',wait:0.2},mY('（立ち止まって）行きません',1.4,'talk'),sY('……あ、はい',1.0,'confused'),{face:1},sY('あ、そこの皆さーん！ もう一軒どうですか〜？',1.9,'smile'),{walk:680},cY('（前がひらけた）',1.3),mY('（……帰ろ）',1.2)],
+   winTitle:'帰り道、こじあけた',share:{text:'断っても横に並んで、前に回り込んでくるキャッチを、脳内で成敗した。'},card:[['断った回数','3回'],['回り込まれた','1回']]},
+ 9:{script:[cY('（土曜の夜。お風呂上がりに、取っておいた2個入りアイス）',2.1),{inset:1.7,label:'2個入り'},{walk:SERVE_X},{face:-1},sY('あ、いいな。1個ちょうだい',1.5),mY('え、これ自分で買ったやつ……',1.6,'trouble'),sY('2個あるじゃん。1個ずつで、ちょうどいいって',2.1,'smug',1),cY('（もうピックを持ってきている）',1.5),{inset:1.4,label:'私の2個'},{cutin:true}],
+   tsukkomi:['2個しかないのに','1個取るんかい！！'],
+   punchTaunts:PT(['1個ずつでしょ？'],['ひゃっ！'],['ピック！ ピックが飛んでった！'],['（ほっぺを押さえて回転）……もちもち……']),
+   lines:{idle:['いいなぁ','1個ずつでしょ','あーん'],idleHurt:['……え、だめ？','（ピックを置く）','……1個ずつ'],ret:'ね、1個だけ',bye:'コンビニ行ってくる',hit:['いてっ','え、なに？','ちょっと！'],final:'……もち……'},
+   ochi:[{hero:'normal',wait:0.3},mY('（容器を抱えて）今日は、これを楽しみに帰ってきたの',2.2,'talk'),sY('……そんなに？ じゃ、コンビニで自分の買ってくるわ',2.2,'confused'),{walk:640},cY('（2個とも、ひとりで味わった）',1.9)],
+   winTitle:'2個とも、守り抜いた',share:{text:'2個入りアイスを「1個ちょうだい」と言われて、脳内で成敗した。'},card:[['2個入りアイス','2個'],['「1個ちょうだい」','1回']]},
+ 10:{script:[cY('（自分の十八番。サビに入る）',1.7),{walk:SERVE_X},sY('♪〜〜（少し高い声で重ねてくる）',1.6,'bow'),cY('（手のひらで「ストップ」の合図。……友達は、ウインクして声を張った）',2.2),mY('ごめん、この曲だけは一人で歌いたいの',1.9,'talk'),sY('えー、ハモったほうが盛り上がるって！ じゃ、下ね',2.2,'smug',1),cY('（2番から、また重ねてきた）',1.4),{cutin:true}],
+   tsukkomi:['上も下も','いらんねん！！'],
+   punchTaunts:PT(['♪〜〜（下ハモ）'],['マイク！'],['エコー！ エコーが最大に！'],['（回転しながら）♪〜〜〜（ビブラート）']),
+   lines:{idle:['〜♪','次、何入れる？','いい感じ〜'],idleHurt:['……え？','（マイクを持ち直す）','……下ハモ？'],ret:'一緒に歌う？',bye:'延長する？',hit:['いてっ','え？','ちょ、歌ってるのに'],final:'……♪（音程が外れる）'},
+   ochi:[{note:{style:'pause',title:'一時停止中',rows:[['⏸','']]},wait:1.6},mY('ほんとに、一人で歌いたいの',1.7,'talk'),sY('……あ、ガチのやつね。了解、聴く専になる',2.1,'confused'),cY('（友達はマイクを置いて、タンバリンを小さく振った）',2.0),cY('（最後まで、一人で歌いきった）',1.8)],
+   winTitle:'十八番、ひとりで歌いきった',share:{text:'「一人で歌いたい」と言ったのに「じゃ、下ね」とハモる友達を、脳内で成敗した。'},card:[['歌った曲','1曲'],['「じゃ、下ね」','1回']]},
+ 11:{script:[cY('（上映中。暗い客席。いちばんいいシーン）',1.6),{glow:1},{hero:'trouble',wait:0.6},mY('（小声で）……すみません、まぶしくて',1.8,'trouble'),sY('（小声で）あ、すぐなんで',1.4),{glow:2},{cap:['（画面の明るさが、さらに上がった）',1.7],wait:1.8,thumb:true},{wait:0.6},{cutin:true}],
+   tsukkomi:['映画館で','光らすな！！'],
+   punchTaunts:PT(['しーっ、映画中だから'],['わっ！'],['スマホ！ 明るさ最大のまま飛んでった！'],['（画面の光に下から照らされて回転）']),
+   lines:{idle:['（スマホを見る）','あ、通知','すぐなんで'],idleHurt:['……え？','（画面を伏せる）','……すぐ、なんで'],ret:'すぐなんで',bye:'面白かった〜',hit:['いてっ','しっ！','え、なに？'],final:'……きない、モード……'},
+   ochi:[{glow:2},{wait:0.5},{tap:1.8},cY('後ろの席の人「（小声で）すみません、画面……」',1.9),sY('……あ',0.9,'surprised'),{glow:0},cY('（慌てて画面を消して、カバンにしまった。客席が暗くなる）',2.0),{hero:'normal',wait:0.2},mY('（……ここからが、いいところ）',1.6)],
+   winTitle:'上映中は、暗いままにした',share:{text:'上映中に「すぐなんで」とスマホを光らせる人を、脳内で成敗した。'},card:[['上映時間','120分'],['明るさ','2段階アップ']]},
+ 12:{script:[kY('10:00 会議'),{note:{style:'board',title:'議題',rows:[['1','今日の締切について']]},wait:1.5},{walk:345},sY('そういえば俺が入社したての頃、似た案件があってさ',2.3),{react:[0]},sY('三日徹夜して、取引先の部長に「君、根性あるね」って言われたんだよ',2.6),kY('10:20'),mY('あの、締切の件ですが……',1.5,'trouble'),sY('待って、ここからが面白いんだって。その部長がさ……',2.3,'smug',1),nY(1,'（小声で）……「根性あるね」、3週連続',1.9),{cutin:true}],
+   tsukkomi:['オチまで','知っとるわ！！'],
+   punchTaunts:PT(['「君、根性あるね」って言われてさ'],['ぬおっ！'],['ホワイトボード！ 議題が消える！'],['（回転しながら）……きみ、こんじょう、あるね……']),
+   lines:{idle:['俺が若い頃はな','あれは伝説','まあ聞け'],idleHurt:['……え？','（咳払い）','……その話、前もしたか'],ret:'で、どこまで話したっけ',bye:'いい話だったろ',hit:['いてっ','おい','なんだ'],final:'……三日、徹夜……'},
+   ochi:[nY(0,'……で、部長に「君、根性あるね」って言われたんですよね',2.3),sY('……あれ、それ話したっけ？',1.6,'confused'),{react:[0,'（うん）']},{react:[1,'（うん）']},{hero:'normal',wait:0.3},sY('……じゃ、締切の件いこうか',1.7,'smile'),kY('10:22　議題1')],
+   winTitle:'オチを先に言って、本題へ',share:{text:'会議で毎週同じ武勇伝を話す上司を、脳内で成敗した。'},card:[['同じ話','3週連続'],['議題1まで','22分']]},
+ 13:{script:[cY('（夕方6時。夕食の準備をしようと炊飯器を開けると、空っぽ）',2.1),mY('ねえ、炊飯器、空っぽなのに保温ついてる',1.9,'talk'),{walk:SERVE_X},sY('（スマホを見たまま）え、そうなの？',1.5,'confused'),mY('お昼、最後によそったよね？',1.5),sY('あー、あとで切ろうと思ってた',1.7),mY('……今から炊いたら、7時だよ',1.5,'trouble'),sY('え、じゃあ今日はパンでよくない？',1.8,'smug',1),{cutin:true}],
+   tsukkomi:['空気を','保温すな！！'],
+   lines:{idle:['（スマホを見る）','あとでやる','パンでよくない？'],idleHurt:['……え？','（スマホを置く）','……保温？'],ret:'あとでやるって',bye:'おやすみ〜',hit:['いてっ','え？','なに？'],final:'（炊飯器が「ピーッ」と鳴る）'},
+   ochi:[mY('（炊飯器の表示を指さして）保温、7時間だって',1.9,'talk'),{note:{style:'display',title:'炊飯器',rows:[['保温','7時間']]},wait:1.8},sY('……7時間も、空気を温めてたのか',1.9,'confused'),sY('今日の夕飯、俺がやる。米炊いてる間に、なんか一品作るわ',2.5,'smile'),sY('あと、空にしたら保温切る。……これ貼っとく',2.1,'smile'),{note:{style:'sticky',title:'',rows:[['空にしたら','保温OFF']]},wait:2.0},{hero:'normal',wait:0.2},mY('（……今夜は、座ってていいらしい）',1.7)],
+   winTitle:'夕飯係、交代させた',share:{text:'空っぽの炊飯器を保温のまま放置して「パンでよくない？」と言う夫を、脳内で成敗（炊飯器だけ）した。'},card:[['お米','0合'],['保温','7時間']]},
+ 14:{script:[cY('（昼休み。会社の先輩に誘われて、定食屋へ）',1.9),{walk:SERVE_X},{face:-1},sY('ここの唐揚げ、うまいんだよ（くちゃ）',1.9),cY('（くちゃ……くちゃ……）',1.2),sY('でさ、午後の会議なんだけど（くちゃくちゃ）',2.0),{hero:'trouble',wait:0.2},mY('……はい',0.9,'trouble'),sY('資料のここ（くちゃ）、直しといて（くちゃくちゃ）',2.2,'smug',1),{cutin:true}],
+   tsukkomi:['飲み込んでから','喋って！！'],
+   punchTaunts:PT(['（くちゃ）唐揚げ、食べないの？'],['んぐっ！'],['唐揚げ！ 唐揚げが飛んでった！'],['（ほっぺをふくらませて回転）……ごくん']),
+   lines:{idle:['（くちゃくちゃ）','うまい','でさ、午後の会議'],idleHurt:['……え？','（静かに咀嚼）','……ごくん'],ret:'でさ（くちゃ）',bye:'ごちそうさま',hit:['いてっ','んぐ？','え？'],final:'……ごくん……'},
+   ochi:[{hero:'normal',wait:0.2},mY('すみません、ちゃんとメモしたいので、食べ終わってから聞いてもいいですか？',2.6,'talk'),sY('……あ、そうだね。食べながらだと聞きにくいか',2.0,'confused'),cY('（先輩は口を閉じて、静かに食べはじめた）',1.9),mY('（……唐揚げ、ほんとにおいしい）',1.6)],
+   winTitle:'静かなランチ、取り戻した',share:{text:'くちゃくちゃ食べながら仕事の話をしてくる先輩を、脳内で成敗した。'},card:[['咀嚼音','ずっと'],['昼休み','60分']]},
+ 15:{script:[kY('17:40'),{walk:SERVE_X},sY('例の資料、何時に出る？',1.4),mY('18時に送ります',1.2),cY('（キーボードを打つ。……あと少し）',1.4),kY('17:46'),sY('（背後から）どう？ 今どこ？',1.5),mY('最後の確認です',1.1,'trouble'),kY('17:52'),sY('もう一回だけ、画面見せて？',1.6,'smug',1),cY('（説明しているあいだ、手が止まる）',1.5),{cutin:true}],
+   tsukkomi:['聞かれるたびに','止まっとんねん！！'],
+   punchTaunts:PT(['今どこ？'],['うおっ！'],['コーヒー！ 書類にかかる！'],['（腕時計を見ながら回転）……17時、53分……']),
+   lines:{idle:['今どこ？','（腕時計を見る）','画面見せて？'],idleHurt:['……え？','（コーヒーをすする）','……席で待つか'],ret:'で、今どこ？',bye:'お先〜',hit:['いてっ','おい','なんだ'],final:'……18時で、いい……'},
+   ochi:[mY('18時ちょうどに送ります。それまで、席で待っていてもらえますか',2.6,'talk'),sY('……分かった。席で待つ',1.5,'confused'),{walk:640},kY('18:00'),cY('（送信。上司の席から「お、来た」と声がした）',2.0)],
+   winTitle:'18時ちょうど、送りきった',share:{text:'締切前に何度も「今どこ？」と聞いてくる上司を、脳内で成敗した。'},card:[['締切','18:00'],['「今どこ？」','3回']]},
+ 16:{script:[cY('（木曜の夜。帰りの電車。座席はほぼ埋まっている）',2.0),{react:[2,'……']},{hero:'trouble',wait:0.4},mY('（……隣の人、半分しか座れてない）',1.8,'trouble'),cY('（隣の人は、さらに体を小さくした）',1.6),Object.assign(sY('ふぅ〜（スマホを見ながら、さらに膝を開く）',1.9,'smug'),{thumb:true}),{wait:0.5},{cutin:true}],
+   tsukkomi:['その膝、','二人分や！！'],
+   punchTaunts:PT(['ふぅ〜、疲れた'],['ぬおっ！'],['カバン！ カバンが吊り革に！'],['（膝を開いたまま回転）']),
+   lines:{idle:['ふぅ〜','（スマホを見る）','今日も疲れたな'],idleHurt:['……え？','（咳払い）','……ふぅ'],ret:'ふぅ〜',bye:'お疲れさーん',hit:['いてっ','え、なに？','は？'],final:'……ひとり、ぶん……'},
+   ochi:[{wait:0.3},{shake:0.5},cY('（ガタン、と電車が揺れた）',1.3),{react:[2,'あっ']},sY('（隣を見る）……あ',1.1,'surprised'),{closeLegs:1,wait:0.6},cY('（隣の人の肩が、すっと下りた）',1.8),{react:[2,'ふぅ……']},{hero:'normal',wait:0.2},mY('（……よかった）',1.2)],
+   winTitle:'隣の人の一人分、取り戻した',share:{text:'座席で膝を大きく開いて、隣の人を縮こまらせる人を、脳内で成敗した。'},card:[['座席','7人掛け'],['この人','2人分']]}
+};
+for(const k in V5){const d=STAGE_DEFS[k],v=V5[k];const {lines,share,card,...rest}=v;Object.assign(d,rest);if(lines)d.lines=Object.assign({},d.lines,lines);if(share)d.share=Object.assign({},d.share||{},share);if(card)d.card=Object.assign({},d.card||{},{rows:card});}
+
 /* ===== 自前の絵（キット）：人物・背景・小物を同じ決まりで作って、ステージに割り当てる ===== */
 const KIT_ON=!!(window.SEIBAI_KIT&&window.SEIBAI_CAST&&window.SEIBAI_BG)&&/kit=1/.test(location.hash);/* 自前の絵は品質不足のため既定では使わない（#kit=1 で確認用に表示） */
 function buildKit(){if(!KIT_ON)return;const K=window.SEIBAI_KIT,C=window.SEIBAI_CAST,BK=window.SEIBAI_BG;
@@ -1202,6 +1312,7 @@ function applyLine(){if(!LINE_ON)return;
   const BGM={bg:'marukichi_aligned',bg_apparel:'apparel',bg_konbini:'konbini',bg_ldk:'ldk',bg_karaoke:'karaoke',bg_cinema:'cinema',bg_office:'office',bg_street_day:'street_day',bg_street_night:'street_night',bg_platform:'platform',bg_train:'train'};
   for(const [k,v] of Object.entries(BGM))if(EXT['bg_line_'+v])EXT[k]=EXT['bg_line_'+v];
   for(const k of ['normal','talk','trouble','seat','try_normal','try_talk','try_trouble'])if(EXT['hero_pp_'+k])EXT['hero_'+k]=EXT['hero_pp_'+k];
+  for(const p of ['','try_'])for(const k of ['talk','trouble'])if(EXT['hero_'+p+'normal'])EXT['hero_'+p+k]=EXT['hero_'+p+'normal']; /* ポーズ違いの絵は服が違うので、同じ服の絵に統一（場面ごとに服が変わらないように） */
   const NM={r_salary:'salary',r_student:'student',r_coat:'coat',r_elder:'elder',r_seat:'seat',q_salary:'salary',q_student:'student',q_coat:'coat',q_elder:'elder'},EX=['ex_a','ex_b','ex_c','ex_d','salary','coat','student','elder'];let ei=0;
   for(const k of Object.keys(EXT)){const m=/^npc_(.+)$/.exec(k);if(!m||/^pp_/.test(m[1]))continue;const t=NM[m[1]]||EX[ei++%EX.length];if(EXT['npc_pp_'+t])EXT[k]=EXT['npc_pp_'+t];}
   useChar(SD.char||'karube');}
@@ -1226,7 +1337,7 @@ function reset(){
   const L=G.L=(BG&&BG.ext&&SD.layoutExt)||SD.layout||{};
   const st={isStatic:true,friction:0.8,label:'env'};
   const floor=Bodies.rectangle(W/2,FLOOR+60,W+600,120,{isStatic:true,friction:0.9,label:'floor'});floor.collisionFilter.category=CAT_FLOOR;
-  Composite.add(world,[floor,Bodies.rectangle(-30,H/2,60,H*2,st),Bodies.rectangle(W+30,H/2,60,H*2,st),Bodies.rectangle(W/2,20,W+200,60,st),
+  Composite.add(world,[floor,Bodies.rectangle(-30,H/2,60,H*2,st),Bodies.rectangle(W+30,H/2,60,H*2,st),Bodies.rectangle(W/2,20,W+200,60,st),...[Bodies.rectangle(18,H/2,60,H*2,st),Bodies.rectangle(W-18,H/2,60,H*2,st),Bodies.rectangle(W/2,100,W+200,60,st)].map(b=>{b.collisionFilter={category:256,mask:CAT_STAFF,group:0};return b;}),/* 相手の体だけに効く内側の壁と天井（吹き飛んでも顔が画面の外に出ないように。物には効かない） */
     ...[...(L.jugShelf?[Bodies.rectangle(L.jugShelf[0],L.jugShelf[1],L.jugShelf[2],14,{...st,label:'shelf'})]:[]),...(L.catShelf?[Bodies.rectangle(L.catShelf[0],L.catShelf[1],L.catShelf[2],9,{...st,label:'shelf'})]:[])].map(b=>{b.collisionFilter.category=CAT_SHELF;return b;})]); // 棚は小物だけが乗る（軽部の体は手前を通過）
   const tl=TB.cx-TB.w/2+11,tr=TB.cx+TB.w/2-11;
   G.tableStatic=SD.table&&SD.table.none?[]:[Bodies.rectangle(TB.cx,TABLE_TOP+8,TB.w,16,{...st,label:'tableS'}),Bodies.rectangle(tl,(TABLE_TOP+16+FLOOR)/2,12,FLOOR-TABLE_TOP-16,{...st,label:'tableS'}),Bodies.rectangle(tr,(TABLE_TOP+16+FLOOR)/2,12,FLOOR-TABLE_TOP-16,{...st,label:'tableS'})];
@@ -1270,7 +1381,7 @@ function splash(x,y,kind,n,dir){const L={beer:['rgba(246,181,58,1)','rgba(255,21
   sfx('splash');
   if(G&&G.staff&&(kind==='beer'||kind==='water')){const t=G.staff.P.torso.position;if(Math.hypot(t.x-x,t.y-y)<110)G.staff.soak=1;}}
 function dust(x,y,n){for(let i=0;i<n;i++)fx('dust',x+rand(-16,16),y,{vx:rand(-1.6,1.6),vy:rand(-1.3,-0.3),life:rand(0.5,0.9),max:0.9,size:rand(8,16)});}
-function comic(text,x,y,size,col){if(SD.comic&&G.phase==='smash'){(G.bursts=G.bursts||[]).push({x:clamp(x,60,W-60),y,r:size*1.5,t:0,rot:rand(0,1)});if(G.bursts.length>5)G.bursts.shift();}G.comics.push({text,x:clamp(x,60,W-60),y,size,col:col||C.white,t:0,rot:rand(-0.22,0.22)});if(G.comics.length>6)G.comics.shift();}
+function comic(text,x,y,size,col){if(G.bigT>0&&text!=='成敗！')y=Math.max(y,H*0.6);{const hw=String(text).length*size*0.62;x=Math.max(hw+8,Math.min(W-hw-8,x));if((G.phase==='harisen'||G.phase==='smash')&&x-hw<260&&y<H*0.22+170)y=H*0.22+190;}if(SD.comic&&G.phase==='smash'){(G.bursts=G.bursts||[]).push({x:clamp(x,60,W-60),y,r:size*1.5,t:0,rot:rand(0,1)});if(G.bursts.length>5)G.bursts.shift();}G.comics.push({text,x,y,size,col:col||C.white,t:0,rot:rand(-0.22,0.22)});if(G.comics.length>(G.phase==='harisen'?3:6))G.comics.shift();} /* 殴っている間は効果音の文字を3つまで（画面を散らかさない） */
 function addScore(pts,pos,label,key){G.score+=pts;G.pts[key]=(G.pts[key]||0)+pts;
   if(G.phase==='finale'&&pts<500)return; // 決着の瞬間は大きな得点だけ見せる（画面を散らかさない）
   if((G.phase==='words'||G.phase==='harisen')&&pts<300)return; // セリフを叩き返す間は、連続ヒットの文字だけで見せる
@@ -1347,7 +1458,7 @@ function pair(a,b,v){
 /* ================= セリフを叩き返す（words） =================
    相手のセリフが1文字ずつのブロックになって飛んでくる。タップ／スワイプで叩くと相手の顔へ跳ね返る。
    届いた文字はイライラゲージ、当てた文字はスッキリゲージ。スッキリ満タンでとどめ、イライラ満タンで泣き寝入り */
-const WORDS_DEF=['お通し440円','おかわりは有料でーす','お通しはお断りできません','決まりなんでー','席料込みでーす','ポップコーンでーす','キャラメルと塩でーす','お会計はレジでーす'];
+const WORDS_DEF=['お通し600円','おかわりは有料でーす','お通しはお断りできません','決まりなんでー','席料込みでーす','ポップコーンでーす','キャラメルと塩でーす','お会計はレジでーす'];
 function wordsStart(){G.irr=0;G.suk=0;G.talkT=0.6;G.talking=0;G.words=[];G.wqueue=[];G.wordBodies=[];G.combo=0;G.lastHitT=-9;G.lineN=0;}
 function speakLine(){
   const s=G.staff;if(s.mode!=='anim')return;
@@ -1401,11 +1512,13 @@ function wordsEnd(win){
    立て続けに壊すと連鎖倍率、損害が溜まるとブチギレMAX（次の一投が2倍で、触れた物が全部壊れる）。20秒1本勝負 */
 const SMASH_TIME=20,SHOTS=5,STAR_PCT=[30,60,85]; // 投げられるのは5回。破壊率で★1〜3
 function missionsFor(){return [
-  SD.mission?{t:SD.mission.t,ok:()=>G.tears.some(t=>t.name===SD.mission.name&&t.done)||G.props.length===0&&false||(G.brokenNames||[]).includes(SD.mission.name)}:stageNo===1?{t:'440円の貼り紙を破る',ok:()=>G.tears.some(t=>t.kind==='sign'&&t.done)}:{t:(SD.tableName||'卓')+'を壊す',ok:()=>!!G.tableDyn},
+  SD.mission?{t:SD.mission.t,ok:()=>G.tears.some(t=>t.name===SD.mission.name&&t.done)||G.props.length===0&&false||(G.brokenNames||[]).includes(SD.mission.name)}:stageNo===1?{t:'お品書きの貼り紙を破る',ok:()=>G.tears.some(t=>t.kind==='sign'&&t.done)}:{t:(SD.tableName||'卓')+'を壊す',ok:()=>!!G.tableDyn},
   {t:'1投で'+(SD.oneShot||10)+'個以上壊す',ok:()=>G.shotBest>=(SD.oneShot||10)},
   {t:'3投以内で破壊率60%',ok:()=>G.pct3>=60}].map(m=>({...m,done:false}));}
+/* 爽快スコア：操作の結果だけで決まる（ランダムなし）。殴った回数・最大コンボ・クリティカル・最大連鎖・破壊率・トドメ（投げた／ブチギレMAXで決めた）・全壊・チャレンジ */
+function feelScore(){const pct=Math.min(100,Math.round(100*(G.baseDone||0)/(G.totalValue||1)));return (G.hits||0)*100+(G.maxCombo||0)*80+(G.crits||0)*300+Math.round(Math.max(0,(G.maxChain||1)-1)*1000)+pct*30+((G.throws||0)>0?1000:0)+(SD.projectile?(G.throws||0)*200:0)+(G.finisher&&G.finisher.done?1000:0)+(G.zenkai?2000:0)+((G.missions||[]).filter(m=>m.done).length*500);}
 function pctNow(){return Math.min(100,Math.floor(100*(G.baseDone||0)/(G.totalValue||1)));}
-function checkMissions(){for(const m of G.missions)if(!m.done&&m.ok()){m.done=true;G.damage+=50000;G.popups.push({x:W/2,y:330,text:'チャレンジ達成 '+m.t+' +¥50,000',t:1.6,big:true});sfx('stamp');vib([20,20,40]);}}
+function checkMissions(){for(const m of G.missions)if(!m.done&&m.ok()){m.done=true;G.damage+=50000;G.popups.push({x:W/2,y:330,text:'チャレンジ達成 '+m.t,t:1.6,big:true});sfx('stamp');vib([20,20,40]);}}
 /* パチンコ式：店員を引っぱって離すと、反対向きに飛ぶ */
 function slingVel(sl){let vx=(sl.ax-sl.cx)*0.21,vy=(sl.ay-sl.cy)*0.21;const sp=Math.hypot(vx,vy),cap=G.maxReady?50:36;if(sp>cap){vx*=cap/sp;vy*=cap/sp;}return {x:vx,y:vy,p:Math.min(1,Math.hypot(vx,vy)/cap)};}
 /* 物を投げるステージ（STAGE 13 など）：人は投げず、SD.projectile の物を発射台から飛ばす。相手は驚いて尻もちをつくだけ */
@@ -1415,10 +1528,10 @@ function launchSling(){
   if(SD.projectile){const P=SD.projectile,b=Bodies.rectangle(sl.ax,sl.ay,P.w*0.85,P.h*0.85,{label:'shot',restitution:0.25,friction:0.6,frictionAir:0.005,chamfer:{radius:4}});
     Body.setMass(b,P.m||4);b.spr=[P.key,P.w,P.h];b.collisionFilter.category=CAT_PROJ;b.collisionFilter.mask=0xFFFFFFFF&~CAT_STAFF;Body.setVelocity(b,{x:v.x,y:v.y});Body.setAngularVelocity(b,rand(-0.25,0.25));
     Composite.add(G.world,b);G.shotBody=b;G.scared=false;G.shots--;G.throws++;G.shot='fly';G.flyT=0;G.shotBroke=G.broken;sfx('swish',1);vib(15);comic(pick(['いけぇ！','それっ','ぶっとべ']),sl.ax,sl.ay-70,32);
-    if(G.maxReady){G.maxReady=false;G.maxT=4;G.rage=0;slowmo(0.4,0.5);G.flash=0.12;comic('ブチギレ！',W/2,360,66,C.verm);sfx('hit3');}return;}
+    if(G.maxReady){G.maxReady=false;G.maxT=4;G.rage=0;slowmo(0.4,0.5);G.flash=0.12;comic('ブチギレ！',W/2,H*0.78,58,C.verm);sfx('hit3');}return;}
   const s=G.staff;ragSoft(s);s.expr='gag';s.squash={t:0,m:-1.1};for(const p of s.parts)Body.setVelocity(p,{x:v.x*rand(0.9,1.05),y:v.y*rand(0.9,1.05)});Body.setAngularVelocity(s.P.torso,rand(-0.25,0.25));
   G.shots--;G.throws++;G.shot='fly';G.flyT=0;G.shotBroke=G.broken;sfx('swish',1);vib(15);comic(pick(['ブン！','いけぇ！','ぶっとべ']),s.P.torso.position.x,s.P.torso.position.y-80,32);
-  if(G.maxReady){G.maxReady=false;G.maxT=4;G.rage=0;slowmo(0.4,0.5);G.flash=0.12;comic('ブチギレ！',W/2,360,66,C.verm);sfx('hit3');}
+  if(G.maxReady){G.maxReady=false;G.maxT=4;G.rage=0;slowmo(0.4,0.5);G.flash=0.12;comic('ブチギレ！',W/2,H*0.78,58,C.verm);sfx('hit3');}
 }
 const PRICE={jug:[1200,'ジョッキ'],shoyu:[800,'しょうゆ差し'],oshibori:[300,'おしぼり'],hashi:[50,'割り箸'],p_coffee:[450,'コーヒー'],p_can:[120,'空き缶'],p_bottle:[150,'ペットボトル'],
   p_newspaper:[160,'新聞'],p_tissue:[120,'ティッシュ'],p_paperbag:[300,'紙袋'],p_flyer:[50,'チラシ'],p_ashtray:[2000,'携帯灰皿']};
@@ -1440,7 +1553,7 @@ function shatter(b){
   while(G.debris.length>160){Composite.remove(G.world,G.debris.shift());}
 }
 function drawDebris(){for(const d of (G.debris||[])){const c=d.cut;ctx.save();ctx.translate(d.position.x,d.position.y);ctx.rotate(d.angle);ctx.drawImage(c.img,c.sx,c.sy,c.sw,c.sh,-c.dw/2,-c.dh/2,c.dw,c.dh);ctx.restore();}}
-function smashStart(){if(G.staff)G.staff.faceLock=0;G.glow=0;G.cap={text:'※すべて心の中の成敗です。',t:2.2,age:0};G.flash=0.12;Object.assign(G,{brokenNames:[],pct3:0,shots:SHOTS,shot:'aim',sling:null,flyT:0,shotBroke:0,shotBest:0,missions:missionsFor(),stars:0,debris:[],baseDone:0,smashT:SMASH_TIME,damage:0,dispDmg:0,chain:1,lastBreakT:-9,rage:0,maxReady:false,maxT:0,walls:0,broken:0,throws:0,maxChain:1,bestHit:0,grab:null,holes:[],snapBest:0,tears:((G.L&&G.L.tears)||[]).map(t=>({x0:t[0],y0:t[1],x1:t[2],y1:t[3],name:t[4],price:t[5],kind:t[6]||'paper',done:false})),slams:0,cracks:[],air:0,lastRelT:-9,lastSlamT:-9});
+function smashStart(){if(G.staff)G.staff.faceLock=0;G.glow=0;{let first=true;try{first=!localStorage.getItem('seibai_tut');localStorage.setItem('seibai_tut','1');}catch(e){}G.cap=first?{text:'全部、頭の中の話。',t:2.0,age:0}:null;}/* 初めて遊ぶときだけ短く伝える */G.flash=0.12;Object.assign(G,{brokenNames:[],pct3:0,shots:SHOTS,shot:'aim',sling:null,flyT:0,shotBroke:0,shotBest:0,missions:missionsFor(),stars:0,debris:[],baseDone:0,smashT:SMASH_TIME,damage:0,dispDmg:0,chain:1,lastBreakT:-9,rage:0,maxReady:false,maxT:0,walls:0,broken:0,throws:0,maxChain:1,bestHit:0,grab:null,holes:[],snapBest:0,tears:((G.L&&G.L.tears)||[]).map(t=>({x0:t[0],y0:t[1],x1:t[2],y1:t[3],name:t[4],price:t[5],kind:t[6]||'paper',done:false})),slams:0,cracks:[],air:0,lastRelT:-9,lastSlamT:-9});
   if(G.bowl&&!G.bowl.brk)G.bowl.brk=[3500,'お通しの器',6];
   // 破壊率の分母：壊せる物すべての値段＋破れる紙＋テーブル＋壁の穴6つ＋床のヒビ6つ
   G.totalValue=[...G.props,...G.items,...(G.bowl?[G.bowl]:[])].reduce((a,b)=>a+(b.brk?b.brk[0]:0),0)+G.tears.reduce((a,t)=>a+t.price,0)+(SD.tablePrice||45000)+6*18000+6*5000;
@@ -1467,16 +1580,16 @@ function releaseGrab(){
   if(g.staff){const s=G.staff,k=G.maxReady?1.9:1;Object.assign(s,{held:false,downT:0,landed:false,falling:false,still:0});s.expr='gag';
     for(const p of s.parts)Body.setVelocity(p,{x:p.velocity.x*0.3+vx*0.8*k,y:p.velocity.y*0.3+vy*0.8*k});Body.setAngularVelocity(s.P.torso,rand(-0.3,0.3));G.throws++;
     if(sp>12){sfx('swish',1);comic(pick(['ブン！','ぶんっ','ポイッ']),s.P.torso.position.x,s.P.torso.position.y-70,32);}
-    if(G.maxReady){G.maxReady=false;G.maxT=1.8;G.rage=0;slowmo(0.35,0.6);G.flash=0.12;G.shake=18;comic('ブチギレ！',W/2,360,66,C.verm);sfx('hit3');vib([30,20,60]);}
+    if(G.maxReady){G.maxReady=false;G.maxT=1.8;G.rage=0;slowmo(0.35,0.6);G.flash=0.12;G.shake=18;comic('ブチギレ！',W/2,H*0.78,58,C.verm);sfx('hit3');vib([30,20,60]);}
   }else{const b=g.body;Body.setVelocity(b,{x:vx,y:vy});Body.setAngularVelocity(b,rand(-0.4,0.4));b.proj=true;b.hitDone=false;b.thrown=true;b.collisionFilter.category=CAT_PROJ;b.collisionFilter.mask=0xFFFFFFFF;sfx('swish',Math.min(1,sp/30));}
 }
 function chainDamage(price,pos,name,big){
   G.chain=G.time-G.lastBreakT<0.65?Math.min(4,G.chain+0.5):1;G.lastBreakT=G.time;G.maxChain=Math.max(G.maxChain,G.chain);
   const amt=Math.round(price*G.chain*(G.maxT>0?2:1));G.damage+=amt;G.broken++;G.bestHit=Math.max(G.bestHit,amt);
-  G.rage=Math.min(100,G.rage+amt/1500);if(G.rage>=100&&!G.maxReady&&G.maxT<=0){G.maxReady=true;comic('ブチギレMAX！',W/2,360,52,C.verm);sfx('stamp');vib([20,20,40]);}
-  {const same=G.popups.find(q=>q.name===name&&q.t>0.45&&q.sum!=null);if(same){same.n++;same.sum+=amt;same.amt='−¥'+same.sum.toLocaleString('ja-JP');same.name=name;same.label=name+'×'+same.n;same.t=Math.max(same.t,0.9);}else{let y=pos.y-24;for(const q of G.popups)if(q.t>0.4&&Math.abs(q.x-pos.x)<170&&Math.abs(q.y-y)<34)y=q.y-36;/* 重ならないよう上に積む */
-  G.popups.push({x:pos.x,y,amt:'−¥'+amt.toLocaleString('ja-JP'),name,label:name,n:1,sum:amt,text:'−¥'+amt.toLocaleString('ja-JP')+' '+name,t:1.1,big:big||amt>=10000});if(G.popups.length>5)G.popups.shift();}}
-  if(G.totalValue&&!G.zenkai&&G.baseDone>=G.totalValue*0.999){G.zenkai=true;G.damage+=300000;G.popups.push({x:W/2,y:300,text:'全壊ボーナス +¥300,000',t:1.6,big:true});comic('全壊！',W/2,250,72,C.verm);sfx('boom');impact(1);}
+  G.rage=Math.min(100,G.rage+amt/1500);if(G.rage>=100&&!G.maxReady&&G.maxT<=0){G.maxReady=true;comic('ブチギレMAX！',W/2,H*0.78,46,C.verm);sfx('stamp');vib([20,20,40]);}
+  {const same=G.popups.find(q=>q.name===name&&q.t>0.45&&q.sum!=null);if(same){same.n++;same.sum+=amt;same.amt='+'+Math.max(1,Math.round(100*same.sum/(G.totalValue||1)))+'%';same.name=name;same.label=name+'×'+same.n;same.t=Math.max(same.t,0.9);}else{let y=pos.y-24;for(const q of G.popups)if(q.t>0.4&&Math.abs(q.x-pos.x)<170&&Math.abs(q.y-y)<34)y=q.y-36;/* 重ならないよう上に積む */
+  {const pc='+'+Math.max(1,Math.round(100*amt/(G.totalValue||1)))+'%';G.popups.push({x:pos.x,y,amt:pc,name,label:name,n:1,sum:amt,text:pc+' '+name,t:1.1,big:big||amt>=10000});}/* 金額ではなく、破壊率が何%増えたか */if(G.popups.length>3)G.popups.shift();}}
+  if(G.totalValue&&!G.zenkai&&G.baseDone>=G.totalValue*0.999){G.zenkai=true;G.damage+=300000;G.popups.push({x:W/2,y:300,text:'全壊ボーナス',t:1.6,big:true});comic('全壊！',W/2,250,72,C.verm);sfx('boom');impact(1);}
 }
 function breakIt(b){
   b.broken=true;(G.brokenNames=G.brokenNames||[]).push(b.brk[1]);if(!b.spr&&b===G.bowl)b.spr=['bowl',90,EXT.bowl?72:38];shatter(b);G.baseDone+=b.brk[0];const [price,name]=b.brk;chainDamage(price,b.position,name,price>=10000);
@@ -1506,7 +1619,7 @@ function tearIt(t){
   if(t.kind==='glass'){for(let i=0;i<22;i++){const a=rand(0,6.28),sp=rand(2,7);fx('shard',rand(t.x0,t.x1),rand(t.y0,t.y1),{vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-2,life:rand(0.6,1.1),max:1.1,size:rand(3,6),vr:rand(-0.4,0.4),col:'rgba(225,240,250,0.95)'});}sfx('glass',2);sfx('boom');impact(0.8);comic(pick(['パリーン','ガシャーン']),cx,cy-20,38,C.white);return;}
   const col=t.kind==='noren'?'#2D3E66':'#EFE4CC';for(let i=0;i<(t.kind==='noren'?14:22);i++)fx('paper',rand(t.x0,t.x1),rand(t.y0,t.y1),{vx:rand(-3,3),vy:rand(-4,0),life:rand(1.2,2),max:2,size:rand(5,10),vr:rand(-0.3,0.3),col});
   sfx('swish',1);sfx('soft');
-  if(t.kind==='sign'){comic('440円、破り捨て！',W/2,320,48,C.yellow);G.hitstop=Math.max(G.hitstop,0.12);G.shake=Math.max(G.shake,14);vib([20,20,60]);}
+  if(t.kind==='sign'){comic('お品書き、破り捨て！',W/2,320,48,C.yellow);G.hitstop=Math.max(G.hitstop,0.12);G.shake=Math.max(G.shake,14);vib([20,20,60]);}
   else comic(t.kind==='noren'?'ビリィッ':'ビリッ',cx,cy-20,34,C.white);
 }
 /* 衝撃の重さ：一瞬止める・カメラを寄せる・白く光らせる（power 0〜1） */
@@ -1529,13 +1642,13 @@ function composeBA(){ // ビフォー・アフターを1枚に（シェア用）
   if(a)x.drawImage(a,0,0);x.drawImage(b,540,0);x.fillStyle=UI.k;x.fillRect(536,0,8,960);
   const tag=(t,px,col)=>{x.font='600 30px '+FP;const w=x.measureText(t).width+28;x.fillStyle=col;x.fillRect(px,24,w,46);x.fillStyle=col===UI.k?UI.s:UI.k;x.textBaseline='middle';x.fillText(t,px+14,48);};
   tag('BEFORE',24,UI.k);tag('AFTER',564,UI.r);
-  x.font='600 34px '+FP;x.textAlign='right';x.lineWidth=8;x.strokeStyle=UI.s;const d='¥'+Math.round(G.damage||0).toLocaleString('ja-JP');x.strokeText(d,1056,920);x.fillStyle=UI.k;x.fillText(d,1056,920);
+  x.font='600 34px '+FP;x.textAlign='right';x.lineWidth=8;x.strokeStyle=UI.s;const d='爽快 '+feelScore().toLocaleString('ja-JP');x.strokeText(d,1056,920);x.fillStyle=UI.k;x.fillText(d,1056,920);
   try{G.snap=c.toDataURL('image/jpeg',0.86);}catch(e){G.snap='x';}
 }
 function smashTick(dt){
   /* トドメの一撃：飛んで0.28秒後に、周りの物をまとめて吹き飛ばす（スロー→白い閃光→爆風） */
-  if(G.finisher&&!G.finisher.done){G.finisher.t+=dt;if(G.finisher.t>0.28){G.finisher.done=true;const c=G.staff.P.torso.position;G.flash=0.35;impact(1);slowmo(0.3,0.7);sfx('boom',1.2);sfx('glass',3);sfx('hit3',1.5);vib([40,30,80]);
-    (G.bursts=G.bursts||[]).push({x:c.x,y:c.y,r:150,t:0,rot:0});comic('成敗！',W/2,300,72,C.yellow);
+  if(G.finisher&&!G.finisher.done){G.finisher.t+=dt;if(G.finisher.t>0.28){G.finisher.done=true;const c=G.staff.P.torso.position;G.flash=0.16;impact(1);slowmo(0.3,0.7);sfx('boom',1.2);sfx('glass',3);sfx('hit3',1.5);vib([40,30,80]);
+    (G.bursts=G.bursts||[]).push({x:c.x,y:c.y,r:150,t:0,rot:0});G.comics=[];comic('成敗！',W/2,300,72,C.yellow);G.bigT=0.8;/* 決め文字は単独で見せる（前の文字を消し、しばらく他の文字は下に出す） */
     for(const b of G.props){if(!b.gen||b.broken)continue;const dx=b.position.x-c.x,dy=b.position.y-c.y,d=Math.hypot(dx,dy);if(d<300){if(b.isStatic)Body.setStatic(b,false);Body.setVelocity(b,{x:dx/(d+1)*22,y:dy/(d+1)*22-8});Body.setAngularVelocity(b,(Math.random()-0.5)*0.6);if(d<190)breakIt(b);}}
     for(const t of G.tears)if(!t.done&&Math.hypot((t.x0+t.x1)/2-c.x,(t.y0+t.y1)/2-c.y)<330)tearIt(t);}}
   if(G.wantBefore){G.wantBefore=false;G.snapBefore=grabFrame();}
@@ -1563,22 +1676,22 @@ function smashTick(dt){
 const HARI_TIME=10,HARI_STARS=[20,40,55],TSUKKOMI_GEN=['なんでやねん！','どないやねん！','おかしいやろ！','ええかげんにせえ！','知らんがな！','やりすぎや！'];
 function hariStart(){smashStart();Object.assign(G,{hariT:PUNCH?8:HARI_TIME,hits:0,combo:0,maxCombo:0,lastHitT:-9,hsw:null,space:false});}
 function hariScale(){return Math.min(3.2,1+Math.max(0,G.combo-1)*0.075);}
-function hariHit(w){
+function hariHit(w){if(G.hariT<=0)return;
   const s=G.staff,now=G.time;const crit=PUNCH&&G.ringT!=null&&((G.ringT%0.8)/0.8)>0.78;/* 輪が小さくなった瞬間に殴るとクリティカル */G.combo=now-G.lastHitT<0.6?G.combo+1:1;G.lastHitT=now;G.maxCombo=Math.max(G.maxCombo,G.combo);
   const sc=hariScale();let best=null,bd=1e9;for(const p of s.parts){const d=Math.hypot(p.position.x-w.x,p.position.y-w.y);if(d<bd){bd=d;best=p;}}
   const tp=s.P.torso.position;let dir=Math.sign(tp.x-w.x)||(Math.random()<0.5?-1:1);if(tp.x>W-110)dir=-1;else if(tp.x<110)dir=1; // 壁ぎわに張り付いたら、反対側へはじき返す
   G.hsw={x:w.x,y:w.y,t:0,dir,sc};
   if(bd>95*sc||s.mode==='rec'){sfx('swish',0.5);comic('スカッ',w.x,w.y-30,24,C.white);G.combo=Math.max(0,G.combo-2);return;}
   G.hits++;const c=G.combo;
-  if(crit){G.crits=(G.crits||0)+1;comic('クリティカル！',W/2,250,56,C.yellow);G.flash=Math.max(G.flash||0,0.18);slowmo(0.35,0.22);sfx('hit3',1.6);sfx('boom',0.6);vib([25,15,40]);G.damage+=5000;ragSoft(s);const d0=Math.sign(s.P.torso.position.x-w.x)||1;for(const p of s.parts)Body.setVelocity(p,{x:d0*14,y:-10});Body.setAngularVelocity(s.P.torso,d0*0.35);(G.bursts=G.bursts||[]).push({x:w.x,y:w.y,r:110,t:0,rot:0});}
+  if(crit){G.crits=(G.crits||0)+1;comic('クリティカル！',W/2,H*0.3,56,C.yellow);G.flash=Math.max(G.flash||0,0.18);slowmo(0.35,0.22);sfx('hit3',1.6);sfx('boom',0.6);vib([25,15,40]);G.damage+=5000;ragSoft(s);const d0=Math.sign(s.P.torso.position.x-w.x)||1;for(const p of s.parts)Body.setVelocity(p,{x:d0*14,y:-10});Body.setAngularVelocity(s.P.torso,d0*0.35);(G.bursts=G.bursts||[]).push({x:w.x,y:w.y,r:110,t:0,rot:0});}
   if(s.mode==='anim'&&c<6){s.flinch={t:0,dir,m:1.2+c*0.15};s.x=clamp(s.x+dir*(8+c*2),270,480);s.squash={t:0,m:0.8};setExpr(s,c%2?'gag':'surprised',0.5);}
   else{ragSoft(s);s.expr='gag';const k=Math.min(2.4,0.7+c*0.06);
     for(const p of s.parts)Body.setVelocity(p,{x:clamp(p.velocity.x*0.3+dir*(7+c*0.5)*k*0.6,-15,15),y:tp.y<300?6:Math.max(-11,p.velocity.y*0.3-(4+c*0.2)*k*0.5)}); // 叩ける範囲に収まるよう、飛ぶ速さに上限Body.setAngularVelocity(s.P.torso,dir*(0.25+c*0.01));
     if(best===s.P.head&&(s.bumps||0)<3&&c%4===0)s.bumps=(s.bumps||0)+1;}
-  if(PUNCH){G.heroPose='talk';G.heroPoseT=0.18;comic(pick(['ドゴッ','バキッ','ボコッ','ゴスッ']),clamp(w.x,90,W-90),w.y-50,Math.min(60,34+c*1.2),c>=10?C.yellow:C.white);
-    /* 相手の反応：最初は余裕→焦り→必死の言い訳（ステージ固有） */const T=SD.punchTaunts;if(T&&(c===1||c===4||c===9||c===15)){const lv=T.filter(t=>c>=t[0]).pop();if(lv)say(pick(lv[1]),1.1,c>=9?'dizzy':'surprised');}
+  if(PUNCH){G.heroPose='talk';G.heroPoseT=0.18;comic(pick(['ドゴッ','ドカッ','ボコッ','ゴスッ']),clamp(w.x-dir*150,90,W-90),w.y-20,/* 顔の表情が隠れないよう、殴った所の横に出す */Math.min(60,34+c*1.2),c>=10?C.yellow:C.white);
+    /* 相手の反応：最初は余裕→焦り→必死の言い訳（ステージ固有） */const T=SD.punchTaunts,hn=G.hits,TI=[1,3,6,10].indexOf(hn);if(T&&TI>=0&&T[TI]){say(pick(T[TI][1]),1.3,TI>=2?'dizzy':'surprised');} /* 殴った合計の 1・3・6・10 発目に、段階ごとの台詞（連打が途切れても最後まで見られる。8秒で10発＝1秒に1.3回） */
     /* パンチ音：毎回「打撃＋低い衝撃」を重ねて重さを出す。5発ごとに家具が鳴る */sfx(c%3===0?'hit3':'hit2',Math.min(2,1+c*0.04));sfx('thunk',0.55);if(c%5===0)sfx('boom',0.35);}
-  else{const pool=[...(SD.hariWords||[]),...TSUKKOMI_GEN];comic(pick(pool),clamp(w.x+dir*-30,90,W-90),w.y-60-Math.random()*30,Math.min(56,30+c*1.2),c>=20?C.verm:c>=10?C.yellow:C.white);
+  else{const pool=[...(SD.hariWords||[]),...TSUKKOMI_GEN];comic(pick(pool),clamp(w.x-dir*150,90,W-90),w.y+50+Math.random()*30,Math.min(56,30+c*1.2),c>=20?C.verm:c>=10?C.yellow:C.white);
   sfx('harisen',Math.min(2,1+c*0.03));}G.hitstop=Math.max(G.hitstop,PUNCH?0.045:0.02);G.shake=Math.max(G.shake,(PUNCH?9:6)+Math.min(14,c*0.5));G.zoomPunch=Math.max(G.zoomPunch||0,PUNCH?0.07:0.04);if(PUNCH)G.flash=Math.max(G.flash||0,0.03);vib(12); // 連打を止めないよう、止める時間はごく短くring(best.position.x,best.position.y,18*sc,0.25);sparks(best.position.x,best.position.y,6+Math.min(14,c),1+c*0.03);
   G.damage+=500*c; // ツッコミ点（連打ほど高い）
   if(PUNCH){if(c===8){comic('連打！',W/2,300,46,C.yellow);G.flash=0.06;}if(c===16){comic('止まらない！',W/2,300,50,C.verm);G.flash=0.1;slowmo(0.5,0.25);}}
@@ -1592,7 +1705,7 @@ function hariTick(dt){
   if(PUNCH)G.ringT=(G.ringT||0)+dt;
   if(PUNCH&&SD.hero&&G.staff.mode==='anim'){const hx=SD.hero.x;G.staff.f=hx<G.staff.x?-1:1;G.staff.faceLock=G.staff.f;}/* 殴られている間、相手は主人公の方を向く */
   if(G.wantBefore){G.wantBefore=false;G.snapBefore=grabFrame();}
-  G.hariT-=dt;if(G.hsw){G.hsw.t+=dt;if(G.hsw.t>0.16)G.hsw=null;}
+  G.hariT-=dt;if(G.hsw){G.hsw.t+=dt;if(G.hsw.t>0.22)G.hsw=null;} /* 拳が出て戻るまで0.22秒（目で追える長さ） */
   const s=G.staff;
   if(s.mode==='rag')for(const t of G.tears){if(t.done)continue;for(const p of s.parts){const q=p.position;if(q.x>t.x0&&q.x<t.x1&&q.y>t.y0&&q.y<t.y1&&p.speed>7){tearIt(t);break;}}}
   if(s.mode==='rag'&&!G.space&&s.still>0.5&&G.time-G.lastHitT>0.8)startRecover(s);
@@ -1601,16 +1714,26 @@ function hariTick(dt){
     if(!G.space){const tp=s.P.torso.position;ragSoft(s);s.expr='gag';const d=tp.x>W/2?-1:1;for(const p of s.parts)Body.setVelocity(p,{x:d*16,y:-18});Body.setAngularVelocity(s.P.torso,d*0.4);}
     sfx('harisen',0.7);sfx('boom');impact(1);G.stampT=0;G.phase='finale';G.phaseT=0;G.noFlip=true;}
 }
-function drawFist(h){const k=h.t/0.16,e=k<0.25?k/0.25:1,sc=0.85+Math.min(0.35,(G.combo||1)*0.02),hq=SD.hero&&heroInfo(),from=hq?{x:hq.x,y:hq.y-hq.h*0.62}:{x:h.dir>0?-40:W+40,y:H*0.82},bx=from.x,tx=h.x-h.dir*26,ty=Math.max(h.y,G.staff.P.torso.position.y-10),x=bx+(tx-bx)*e,y=from.y+(ty-from.y)*e;/* 主人公の肩から、相手の胴に向けて伸びる（顔は隠さない） */
-  ctx.save();ctx.globalAlpha=k>0.7?1-(k-0.7)/0.3:1;
-  /* 腕（画面の下から伸びる） */ctx.strokeStyle=UI.s;ctx.lineCap='round';ctx.lineWidth=22*sc;ctx.beginPath();ctx.moveTo(bx,from.y);ctx.lineTo(x-h.dir*20,y+4);ctx.stroke();ctx.strokeStyle=SD.color?'#EE8466':'#F1CDB3';/* 袖の色（試着中の服） */ctx.lineWidth=16*sc;ctx.stroke();
-  /* こぶし */ctx.translate(x,y);ctx.scale(sc,sc);ctx.fillStyle='#F1CDB3';ctx.strokeStyle=UI.s;ctx.lineWidth=4;ctx.beginPath();ctx.ellipse(0,0,30,24,0,0,7);ctx.fill();ctx.stroke();
-  for(let i=0;i<3;i++){ctx.beginPath();ctx.moveTo(h.dir*12,-16+i*12);ctx.lineTo(h.dir*26,-14+i*12);ctx.stroke();}
-  if(k<0.5){ctx.strokeStyle='rgba(25,25,25,.5)';ctx.lineWidth=3;for(let i=0;i<4;i++){ctx.beginPath();ctx.moveTo(-h.dir*40,-18+i*12);ctx.lineTo(-h.dir*80,-22+i*12);ctx.stroke();}}
-  ctx.restore();}
+function drawFist(h){/* 画面の手前から大きな拳が飛び出して、押した場所を殴る（肩から長い腕を伸ばさない） */
+  const k=h.t/0.22,go=k<0.3?E_out(k/0.3):k<0.55?1:1-E_out((k-0.55)/0.45),sc=1+Math.min(0.3,(G.combo||1)*0.015),side=h.dir>0?-1:1;
+  const ax=clamp(h.x+side*150,90,W-90),ay=H+40,tx=h.x,ty=h.y+22;const x=ax+(tx-ax)*go,y=ay+(ty-ay)*go,ang=Math.atan2(ty-ay,tx-ax);
+  const sz=(1.1-0.3*go)*sc; /* 手前ほど大きく、相手に届くと小さく（遠近） */
+  ctx.save();ctx.globalAlpha=k>0.8?1-(k-0.8)/0.2:1;
+  /* 前腕：画面の下の端から拳まで、手前ほど太く描く（腕は必ず画面下につながる。肩から伸びる長い棒にはしない） */const nx=-Math.sin(ang),ny=Math.cos(ang),w0=58*sz,w1=28*sz,col=SD.color?((SD.hero&&SD.hero.pre==='try_'&&!G.heroNoPre)?'#EE8466':'#E8D2B6'):'#5b7fb0';/* 袖の色は、その場面の主人公の服に合わせる */
+  ctx.beginPath();ctx.moveTo(ax+nx*w0,ay+ny*w0);ctx.lineTo(x+nx*w1,y+ny*w1);ctx.lineTo(x-nx*w1,y-ny*w1);ctx.lineTo(ax-nx*w0,ay-ny*w0);ctx.closePath();ctx.fillStyle=col;ctx.fill();ctx.lineWidth=3.5;ctx.strokeStyle=UI.s;ctx.lineJoin='round';ctx.stroke();
+  {const cx=x-Math.cos(ang)*34*sz,cy=y-Math.sin(ang)*34*sz;ctx.beginPath();ctx.moveTo(cx+nx*(w1+4),cy+ny*(w1+4));ctx.lineTo(cx-nx*(w1+4),cy-ny*(w1+4));ctx.lineWidth=5;ctx.stroke();} /* 袖口 */
+  if(go>0.6&&k<0.4){ctx.strokeStyle='rgba(255,255,255,.75)';ctx.lineWidth=4;ctx.lineCap='round';for(let i=-2;i<=2;i++){const o=i*16*sz;ctx.beginPath();ctx.moveTo(x-Math.cos(ang)*80*sz+nx*o*2.2,y-Math.sin(ang)*80*sz+ny*o*2.2);ctx.lineTo(x-Math.cos(ang)*170*sz+nx*o*2.2,y-Math.sin(ang)*170*sz+ny*o*2.2);ctx.stroke();}} /* 勢いの線（腕の外側） */
+  /* 拳：指4本の段差・親指・ハイライト */ctx.translate(x,y);ctx.rotate(ang+Math.PI/2);ctx.scale(sz,sz);
+  ctx.fillStyle='#F1CDB3';ctx.strokeStyle=UI.s;ctx.lineWidth=3.5;ctx.beginPath();ctx.moveTo(-38,10);ctx.quadraticCurveTo(-42,-30,-20,-40);ctx.lineTo(22,-40);ctx.quadraticCurveTo(42,-30,38,10);ctx.quadraticCurveTo(36,34,0,36);ctx.quadraticCurveTo(-36,34,-38,10);ctx.closePath();ctx.fill();ctx.stroke();
+  ctx.lineWidth=2.5;for(let i=0;i<3;i++){const xx=-19+i*19;ctx.beginPath();ctx.moveTo(xx,-40);ctx.lineTo(xx,-22);ctx.stroke();}
+  ctx.fillStyle='#E8BC9E';ctx.beginPath();ctx.moveTo(-38,-2);ctx.quadraticCurveTo(-14,-10,-2,-4);ctx.lineTo(-8,8);ctx.quadraticCurveTo(-24,12,-36,10);ctx.closePath();ctx.fill();ctx.lineWidth=2.5;ctx.stroke(); /* 親指（面で描いて、口の線に見えないように） */
+  ctx.fillStyle='rgba(255,255,255,.45)';ctx.beginPath();ctx.ellipse(-14,-30,10,4,-0.2,0,7);ctx.fill();
+  ctx.restore();
+  if(k>0.28&&k<0.5){/* 当たった瞬間の星形の衝撃 */ctx.save();ctx.translate(tx,ty);ctx.rotate(h.t*3);const r0=34*sc,r1=70*sc;ctx.beginPath();for(let i=0;i<16;i++){const r=i%2?r0:r1,a=i*Math.PI/8;ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r);}ctx.closePath();ctx.fillStyle='rgba(255,210,63,.85)';ctx.fill();ctx.lineWidth=4;ctx.strokeStyle=UI.s;ctx.stroke();ctx.restore();}}
+const E_out=t=>1-Math.pow(1-t,3);
 function drawRing(){if(!PUNCH||G.phase!=='harisen'||G.ringT==null)return;const t=G.staff.P.torso.position,u=(G.ringT%0.8)/0.8,r=110-80*u,hot=u>0.78;
   ctx.save();ctx.lineWidth=hot?6:3;ctx.strokeStyle=hot?'#FFD23F':'rgba(255,255,255,.85)';ctx.beginPath();ctx.arc(t.x,t.y-10,r,0,7);ctx.stroke();ctx.lineWidth=2;ctx.strokeStyle='rgba(25,25,25,.6)';ctx.beginPath();ctx.arc(t.x,t.y-10,30,0,7);ctx.stroke();ctx.restore();}
-function drawHarisen(){const h=G.hsw;if(!h)return;if(PUNCH){drawFist(h);return;}const k=h.t/0.16,ang=h.dir*(-1.2+2.0*Math.min(1,k*1.6)),L=95*h.sc,Wd=46*h.sc;
+function drawHarisen(){const h=G.hsw;if(!h||G.snapMode)return;/* 記念写真（ビフォー・アフター）には手前の拳を写さない */if(PUNCH){drawFist(h);return;}const k=h.t/0.16,ang=h.dir*(-1.2+2.0*Math.min(1,k*1.6)),L=95*h.sc,Wd=46*h.sc;
   ctx.save();ctx.translate(h.x-h.dir*L*0.55,h.y-L*0.2);ctx.rotate(ang);ctx.globalAlpha=k>0.7?1-(k-0.7)/0.3:1;
   ctx.fillStyle='#FBF7EE';ctx.strokeStyle='rgba(25,25,25,.55)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,-8*h.sc);ctx.lineTo(L,-Wd/2);ctx.lineTo(L,Wd/2);ctx.lineTo(0,8*h.sc);ctx.closePath();ctx.fill();ctx.stroke();
   for(let i=1;i<7;i++){const t=i/7;ctx.beginPath();ctx.moveTo(0,(-8+16*t)*h.sc);ctx.lineTo(L,-Wd/2+Wd*t);ctx.stroke();}
@@ -1698,15 +1821,19 @@ function runScript(s,dt,sc,K){
     if(c.say)say(c.say[0],c.say[1],c.say[2]);
     if(c.me){playerSay(c.me[0],c.me[1]);G.heroPose=c.me[2]||'talk';G.heroPoseT=c.me[1]||1.6;}
     if(c.hero){G.heroBase=c.hero;G.heroPose=c.hero;G.heroPoseT=0;}
+    if(c.unpre)G.heroNoPre=true; /* 試着の服から元の服へ */
     if(c.hflip!=null)G.heroFlip=c.hflip;
     if(c.scan)G.scan={t:0,d:c.scan};
     if(c.react){(G.npcR=G.npcR||{})[c.react[0]]={t:0};if(c.react[1])npcSay(c.react[0],c.react[1],1.2);}
     if(c.nflip){(G.npcF=G.npcF||{})[c.nflip[0]]=c.nflip[1];}
     if(c.npc)npcSay(c.npc[0],c.npc[1],c.npc[2]);
-    if(c.cap)G.cap={text:c.cap[0],t:c.cap[1]||1.8,age:0};
-    if(c.card)G.card={text:c.card[0],t:c.card[1]||1.6,age:0};
+    if(c.cap){G.cap={text:c.cap[0],t:c.cap[1]||1.8,age:0};const m=/(\d{1,2}):(\d{2})/.exec(c.cap[0]);if(m)G.clockHM=[+m[1],+m[2]];}
+    if(c.card){G.card={text:c.card[0],t:c.card[1]||1.6,age:0};const m=/(\d{1,2}):(\d{2})/.exec(c.card[0]);if(m)G.clockHM=[+m[1],+m[2]];}
     if(c.glow!=null)G.glow=c.glow;
     if(c.inset)G.inset={t:0,d:c.inset,label:c.label};
+    if(c.note)G.note={t:0,d:c.wait||2,...c.note}; /* 伝票・スマホ画面・付箋などを、画面の中央上に一枚見せる */
+    if(c.tap)G.tap={t:0,d:c.tap}; /* 後ろの席の人が肩をたたく手 */
+    if(c.shake)G.shake=Math.max(G.shake,c.shake*30);
     if(c.mochiN!=null)G.mochiN=c.mochiN;
     if(c.closeLegs)G.closeLegs=true;
     if(c.focus)focusHead(CAMERA.react,c.wait||1.6);
@@ -1720,11 +1847,11 @@ function npcSay(i,text,dur){G.bubbles=G.bubbles.filter(b=>!(b.who==='npc'&&b.i==
 /* 現実に戻る：妄想の破壊を記録してから、店も人も元どおりに作り直し、ステージ別のオチへ */
 function toReality(){
   const pc=pctNow();G.stars=(SD.starPct||STAR_PCT).filter(x=>pc>=x).length;checkMissions();composeBA();
-  const keep={};for(const k of ['damage','stars','missions','stats','broken','maxChain','slams','air','throws','snap','snapBefore','baseDone','totalValue','shotBest','pct3','zenkai','walls','tears','log','score'])keep[k]=G[k];
+  const keep={};for(const k of ['damage','stars','missions','stats','broken','maxChain','slams','air','throws','snap','snapBefore','baseDone','totalValue','shotBest','pct3','zenkai','walls','tears','log','score','hits','maxCombo','crits'])keep[k]=G[k];/* 殴った回数・最大連打もリザルトまで残す */
   reset();Object.assign(G,keep);G.running=true;G.phase='ochi';G.phaseT=0;G.oi=null;G.lb=0;
   const s=G.staff,x=SD.sit?SD.sit.x:(SD.ochiX||SERVE_X);s.mode='anim';s.beaten=false;s.x=x;s.tx=x;s.f=SD.ochiFace||-1;s.faceLock=SD.ochiFace||0;s.hold='none';
   s.pose=restPose(x,s.f);applyPose(s,1/60,true);for(const k of PART_KEYS)s.lastT[k]=s.T[k];setExpr(s,'smile');
-  recResume();G.flash=0.25;G.cap={text:'──現実。',t:1.3,age:0};sfx('soft');duck(false);
+  recResume();G.fadeB=0.55;G.cap=null;sfx('soft');duck(false); /* 「現実」の説明は出さない。短い暗転で、壊れた景色が元に戻って会話の続きへ */
 }
 function updatePhase(dt){
   G.phaseT+=dt;const s=G.staff;
@@ -1742,9 +1869,9 @@ function updatePhase(dt){
     if(!SD.script&&G.step===1&&G.stepT>0.6&&s.act==='place'){s.act='idle';}
     if(!SD.script&&G.step===1&&G.stepT>2.0){G.step=2;G.stepT=0;playerSay(SD.lines.me,1.1);setExpr(s,'smile');}
     if(!SD.script&&G.step===2&&G.stepT>1.2){G.step=3;G.stepT=0;s.act='slip';s.actT=0;s.hold='slip';say(SD.lines.charge,1.8,'smug');G.slipCard=1.6;focusHead(CAMERA.react,1.7);}
-    if(!SD.script&&G.step===3&&G.stepT>1.9){G.step=6;G.stepT=0;playerSay('……一人440円？',1.3);}
-    if(!SD.script&&G.step===6&&G.stepT>1.5){G.step=7;G.stepT=0;say('おかわりは別料金です！',1.6,'smug');focusHead(CAMERA.react,1.6);}
-    if(!SD.script&&G.step===7&&G.stepT>1.7){G.step=4;G.stepT=0;s.act='idle';s.hold='none';G.cutin={t:0,hit:0};G.bubbles=[];}
+    if(!SD.script&&G.step===3&&G.stepT>1.9){G.step=6;G.stepT=0;playerSay(SD.lines.me2||'……600円？',1.9);}
+    if(!SD.script&&G.step===6&&G.stepT>2.1){G.step=7;G.stepT=0;say(SD.lines.charge2||'お席代みたいなものなんでー',1.9,'smug');focusHead(CAMERA.react,1.6);}
+    if(!SD.script&&G.step===7&&G.stepT>2.1){G.step=4;G.stepT=0;s.act='idle';s.hold='none';G.cutin={t:0,hit:0};G.bubbles=[];}
     if(G.step===4){const c=G.cutin;c.t+=dt;const k=Math.floor(c.t/0.2);if(k>=c.hit&&c.hit<SD.tsukkomi.length){c.hit++;G.shake=Math.max(G.shake,c.hit===SD.tsukkomi.length?22:12);sfx(c.hit===SD.tsukkomi.length?'hit3':'hit2');vib(c.hit===SD.tsukkomi.length?[30,20,50]:20);if(c.hit===SD.tsukkomi.length)G.flash=0.1;}}
     if(G.step===4&&G.stepT>1.55){G.cutin=null;G.phase=GAME_MODE==='harisen'?(SD.projectile?'smash':'harisen'):/* 物を投げるステージ（13）は殴らず投げる */GAME_MODE==='smash'?'smash':GAME_MODE==='words'?'words':'throw';G.phaseT=0;s.act='idle';s.hold='none';s.task=null;setExpr(s,'smile');if(G.phase==='words')wordsStart();if(G.phase==='smash')smashStart();if(G.phase==='harisen')hariStart();}
   }else if(G.phase==='ochi'){G.lb=Math.min(1,G.lb+dt*3);if(G.phaseT>1.2&&runScript(s,dt,SD.ochi||[{wait:1.5}],'o')){G.ochiEnd=(G.ochiEnd||0)+dt;if(G.ochiEnd>0.9){if(REC.on&&!G.endCard){G.endCard={t:0};}else if(!REC.on||(G.endCard&&G.endCard.t>2.6)){G.endCard=null;G.phase='finale';G.phaseT=0;G.noFlip=true;showResult();}}}}
@@ -1810,7 +1937,7 @@ function tick(now){try{bgmTick();}catch(e){}
   const dt=clamp((now-(last||now))/1000,0,0.05);last=now;clock+=dt;fpsAcc+=dt;fpsN++;if(fpsAcc>1){window.__fps=Math.round(fpsN/fpsAcc);fpsAcc=0;fpsN=0;}
   const s=G.staff;
   if(G.running){
-    if(G.hitstop>0){G.hitstop-=dt;if(G.phase==='harisen')G.hariT-=dt;} // ハリセンの制限時間は、止まっている間も進める
+    if(G.hitstop>0){G.hitstop-=dt;if(G.phase==='harisen'){G.hariT-=dt;if(G.hariT<=0)G.hitstop=0;}} // 制限時間が来たら止めを解いて、必ずトドメへ進める（超高速連打で止まりっぱなしにしない） // ハリセンの制限時間は、止まっている間も進める
     else{
       updatePhase(dt);if(!G.running){render();return;}
       if(G.slowT>0)G.slowT-=dt;else G.slow+=(1-G.slow)*Math.min(1,dt*5);
@@ -1832,12 +1959,12 @@ function tick(now){try{bgmTick();}catch(e){}
     G.shake*=Math.pow(0.002,dt);if(G.shake<0.2)G.shake=0;
     if(G.wantSnap&&G.phase==='smash'){G.wantSnap=false;G.snapPending=true;}
     if(G.heroPoseT>0){G.heroPoseT-=dt;if(G.heroPoseT<=0)G.heroPose=G.heroBase||'normal';}
-    G.flash=Math.max(0,G.flash-dt);G.flashR=Math.max(0,(G.flashR||0)-dt);G.dim=Math.max(0,G.dim-dt*(G.slow<0.6?0.3:1.6));G.slipCard=Math.max(0,G.slipCard-dt);
+    G.flash=Math.max(0,G.flash-dt*2);G.flashR=Math.max(0,(G.flashR||0)-dt);G.dim=Math.max(0,G.dim-dt*(G.slow<0.6?0.3:1.6));G.slipCard=Math.max(0,G.slipCard-dt);if(G.note){G.note.t+=dt;if(G.note.t>G.note.d+0.3)G.note=null;}if(G.tap){G.tap.t+=dt;if(G.tap.t>G.tap.d)G.tap=null;}if(G.fadeB>0)G.fadeB-=dt;
     if(G.stampT>=0){const pr=G.stampT;G.stampT+=dt;if(pr<0.45&&G.stampT>=0.45)sfx('stamp');}
     for(const b of G.bubbles){b.t-=dt;b.age+=dt;}G.bubbles=G.bubbles.filter(b=>b.t>0);
     G.popAggT+=dt;if(G.popAgg&&G.popAggT>0.35){if(G.phase!=='finale')G.popups.push({x:G.popAggPos.x,y:G.popAggPos.y-24,text:'ポップコーン×'+G.popAgg+' +'+G.popAggPts,t:1});G.popAgg=0;G.popAggPts=0;G.popAggT=0;}
     for(const p of G.popups){p.t-=dt*0.8;p.y-=dt*40;}G.popups=G.popups.filter(p=>p.t>0);
-    for(const c of G.comics)c.t+=dt;G.comics=G.comics.filter(c=>c.t<0.95);
+    for(const c of G.comics)c.t+=dt;G.comics=G.comics.filter(c=>c.t<0.95);if(G.bigT>0)G.bigT-=dt;
     if(s.hurt>0&&s.mode==='anim'){s.hurt-=dt;if(s.hurt<=0&&s.exprT<=0&&s.expr==='confused')s.expr=baseExpr(s);} // イラつきが収まったら営業スマイルに戻る
     if(s.exprT>0){s.exprT-=dt;if(s.exprT<=0&&s.mode==='anim')s.expr=baseExpr(s);}
     else if(s.mode==='anim'&&s.beaten&&s.expr!=='dizzy'&&s.expr!=='gag'&&s.expr!=='surprised')s.expr='dizzy';
@@ -1852,7 +1979,7 @@ function tick(now){try{bgmTick();}catch(e){}
     const hw=W/2/G.zoom,hh=H/2/G.zoom;G.camX=clamp(G.camX,hw,W-hw);G.camY=clamp(G.camY,hh,H-hh);
     G.disp+=(G.score-G.disp)*Math.min(1,dt*8);if(Math.abs(G.score-G.disp)<1)G.disp=G.score;
   }
-  if(SD.smoke&&G.staff&&G.staff.mode!=='rag'&&Math.random()<dt*9){const f=G.staff.P.farmN,ho=R.farm-R.farmC;fx('smoke',f.position.x-ho*Math.sin(f.angle),f.position.y+ho*Math.cos(f.angle)-6,{vx:rand(-0.25,0.25),vy:rand(-0.9,-0.5),life:rand(1.4,2.2),max:2.2,size:rand(5,9)});} // タバコの煙
+  if(SD.smoke&&G.staff&&G.staff.mode!=='rag'&&Math.random()<dt*9){const mo=smokeAt();fx('smoke',mo.x,mo.y,{vx:rand(-0.25,0.25),vy:rand(-0.9,-0.5),life:rand(1.4,2.2),max:2.2,size:rand(5,9)});} // タバコの煙
   const stm=G.L.steam;if(stm&&Math.random()<dt*3)fx('steam',rand(stm[0],stm[1]),stm[2],{vx:rand(-0.2,0.2),vy:rand(-0.5,-0.25),life:2.4,max:2.4,size:rand(14,26)});
   if(!G.running){for(const p of G.parts){p.life-=dt;p.x+=p.vx;p.y+=p.vy;}G.parts=G.parts.filter(p=>p.life>0);}
   s.blink-=dt;if(s.blink<-0.12)s.blink=rand(2,4.5);if(s.squash){s.squash.t+=dt;if(s.squash.t>0.5)s.squash=null;}
@@ -1882,7 +2009,15 @@ function drawTable(){
   let jx=0;if(G.charge){jx=(Math.random()-0.5)*gauge(G.charge.t)*3;}
   const T=SD.table;if(T&&T.img&&ART[T.img]){const tp=parts[0];ctx.save();ctx.translate(tp.position.x+jx,tp.position.y);ctx.rotate(ang);ctx.drawImage(ART[T.img],T.ix,T.iy,T.iw,T.ih);ctx.restore();return;} // ベンチなど1枚絵の卓
   parts.forEach((p,i)=>{if(i===0)sprite(ART.top,p.position.x+jx,p.position.y-(EXT.top?3:0),ang,EXT.top?240:236,EXT.top?28:20);else sprite(ART.leg,p.position.x+jx,p.position.y,ang,EXT.leg?22:16,84);});
+  if(SD.teishoku&&!G.tableDyn&&(G.phase==='intro'||G.phase==='ochi'))drawTeishoku(parts[0].position.x+(SD.teishoku===true?-6:64),parts[0].position.y-14);
 }
+/* STAGE 14：テーブルの唐揚げ定食（盆・ごはん・味噌汁・唐揚げ） */
+function drawTeishoku(x,y){ctx.save();ctx.strokeStyle=UI.s;ctx.lineWidth=2.5;ctx.fillStyle='#8a5a36';ctx.beginPath();ctx.ellipse(x,y+4,62,9,0,0,7);ctx.fill();ctx.stroke();
+  const bowl=(bx,col,top)=>{ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(bx-15,y-8);ctx.quadraticCurveTo(bx,y+12,bx+15,y-8);ctx.closePath();ctx.fill();ctx.stroke();ctx.fillStyle=top;ctx.beginPath();ctx.ellipse(bx,y-8,15,4.5,0,0,7);ctx.fill();ctx.stroke();};
+  bowl(x-34,'#f2ece2','#ffffff');ctx.fillStyle='#ffffff';ctx.beginPath();ctx.arc(x-34,y-10,9,Math.PI,0);ctx.fill();ctx.stroke(); /* ごはん */
+  bowl(x-6,'#7a2e22','#c08a4a'); /* 味噌汁 */
+  ctx.fillStyle='#f4f1ea';ctx.beginPath();ctx.ellipse(x+30,y-3,22,6,0,0,7);ctx.fill();ctx.stroke();ctx.fillStyle='#c27a35';for(const [dx,dy] of [[-8,-8],[4,-10],[14,-6],[-2,-4]]){ctx.beginPath();ctx.arc(x+30+dx,y+dy,6,0,7);ctx.fill();ctx.stroke();} /* 唐揚げ */
+  ctx.restore();}
 function shadows(){
   const s=G.staff,list=[[s.P.pelvis.position,58],[s.P.shinN.position,26],[s.P.shinF.position,26]];
   for(const b of G.items)list.push([b.position,b.def.w]);if(G.bowl)list.push([G.bowl.position,70]);if(G.tableDyn)list.push([G.tableDyn.position,220]);
@@ -1900,13 +2035,21 @@ function stepApron(s,dt){ // 前掛けの裾：脚の角度を少し遅れて追
   if(s.apA==null){s.apA=tg;s.apV=0;}
   s.apV+=(wrap(tg-s.apA)*55-s.apV*7)*dt;s.apA+=s.apV*dt;
 }
+/* 全身1枚で描く：胴の位置・傾きに合わせて丸ごと動かす（OX・TOP は tools/peeps_full_export.html の書き出し条件） */
+const FULL_OX=54,FULL_TOP=114;
+function drawStaffFull(s,fl){const P=s.P;let e=s.expr;if(e==='smile'&&s.blink<0)e='bow';const im=KAR.full[e]||KAR.full.smile;
+  ctx.save();ctx.translate(P.torso.position.x,P.torso.position.y);ctx.rotate(P.torso.angle);if(fl)ctx.scale(-1,1);
+  if(s.squash){const q=Math.exp(-s.squash.t*11)*Math.cos(s.squash.t*28)*s.squash.m;ctx.scale(1+0.08*q,1-0.06*q);}
+  partXf(KAR.parts.torso,-(R.neck-R.torsoC),R.torsoC);ctx.drawImage(graded(im),-FULL_OX,-FULL_TOP);ctx.restore();}
 function drawStaffImg(s,fl){
+  if(KAR.full){drawStaffFull(s,fl);return;}
   const P=s.P,K=KAR.rig;
   const arm=(u,f,far)=>{drawKPart(u,'uarm',-R.uarm/2,R.uarm/2,fl,far);drawKPart(f,'farm',-R.farmC,R.farm-R.farmC,fl,far);};
-  const leg=(t,sh,far)=>{drawKPart(t,'thigh',-R.thigh/2,R.thigh/2,fl,far);drawKPart(sh,'shin',-R.shinC,R.shin-R.shinC,fl,far);};
+  const legOff=s.mode!=='rag'&&!SD.noLegOff;const leg=(t,sh,far)=>{if(legOff){ctx.save();ctx.translate(far?(fl?9:-9):(fl?-5:5),0);}drawKPart(t,'thigh',-R.thigh/2,R.thigh/2,fl,far);drawKPart(sh,'shin',-R.shinC,R.shin-R.shinC,fl,far);if(legOff)ctx.restore();};
   if(!(SD.hideFarArm&&s.mode!=='rag'))arm(P.uarmF,P.farmF,true);leg(P.thighF,P.shinF,true);leg(P.thighN,P.shinN,false);
   drawKPart(P.pelvis,'pelvis',-R.waistUp,R.hipDown,fl);
   drawKPart(P.torso,'torso',-(R.neck-R.torsoC),R.torsoC,fl);
+  if(SD.armExt)drawArmExt(P.torso,fl);
   if(KAR.parts.apron_bib)drawKPart(P.torso,'apron_bib',-(R.neck-R.torsoC),R.torsoC,fl,false,K.kB);
   // 前掛けの裾：腰ひもの位置を支点に、揺れの角度で描く
   if(KAR.parts.apron_skirt){const pv=P.pelvis,wp={x:pv.position.x+R.waistUp*Math.sin(pv.angle),y:pv.position.y-R.waistUp*Math.cos(pv.angle)},sk=KAR.parts.apron_skirt;
@@ -1920,9 +2063,34 @@ function drawStaffImg(s,fl){
   if(s.bumps||s.pops){ctx.save();ctx.translate(P.head.position.x,P.head.position.y);ctx.rotate(P.head.angle);if(fl)ctx.scale(-1,1);ctx.translate(0,R.headC);ctx.scale(hk,hk);ctx.translate(0,-R.headC);drawHurt();ctx.restore();}
   arm(P.uarmN,P.farmN,false);
 }
-function drawStaff(s){
+/* カラオケ：二人ともマイクを手に持つ（主人公は胸の前、相手は手の位置） */
+function drawMic(x,y,a){ctx.save();ctx.translate(x,y);ctx.rotate(a);ctx.fillStyle='#2b2a2e';ctx.strokeStyle=UI.s;ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(-5,0);ctx.lineTo(5,0);ctx.lineTo(3.5,34);ctx.lineTo(-3.5,34);ctx.closePath();ctx.fill();ctx.stroke();
+  ctx.fillStyle='#bfc3c9';ctx.beginPath();ctx.arc(0,-6,9,0,7);ctx.fill();ctx.stroke();ctx.strokeStyle='rgba(60,60,60,.5)';ctx.lineWidth=1.2;for(let i=-1;i<=1;i++){ctx.beginPath();ctx.moveTo(-8,-6+i*4);ctx.lineTo(8,-6+i*4);ctx.stroke();}ctx.restore();}
+function drawMics(){if(G.phase!=='intro'&&G.phase!=='ochi')return;const q=heroInfo();if(q){const d=q.flip?-1:1;drawMic(q.x+d*q.w*0.16,q.y-q.h*0.62,-0.35*d);}
+  const s=G.staff;if(G.phase==='ochi'&&G.cap&&/マイクを置/.test(G.cap.text||''))G.micDown=true;/* オチ：ナレで置くまでは持っている */if(s&&s.mode!=='rag'&&(G.phase==='intro'||(G.phase==='ochi'&&!G.micDown))){const f=s.P.farmN,ho=R.farm-R.farmC,hx=f.position.x-ho*Math.sin(f.angle),hy=f.position.y+ho*Math.cos(f.angle);drawMic(hx,hy-18,-0.2*s.f);}}
+/* 台詞で「持っている」物を、相手の手元に描く（STAGE 02 の飲み物、STAGE 07 の携帯灰皿） */
+function drawHeldProp(){const P=SD.holdProp,s=G.staff;if(!s||s.mode==='rag'||!P.ph.includes(G.phase))return;if(P.after&&G.phase==='ochi'&&(G.phaseT||0)<P.after)return;
+  const im=ART[P.key+'_line']||ART[P.key];if(!im)return;const tp=s.P.torso.position,x=tp.x+s.f*(P.dx||0),y=tp.y+(P.dy||0);ctx.drawImage(im,x-P.w/2,y-P.h/2,P.w,P.h);}
+/* STAGE 06：焼き鳥の皿（半分なくなっている） */
+function drawYakitori(){const t=G.tableStatic&&G.tableStatic[0];if(!t)return;const x=t.position.x+40,y=t.position.y-14;ctx.save();ctx.strokeStyle=UI.s;ctx.lineWidth=2.5;ctx.fillStyle='#f4f1ea';ctx.beginPath();ctx.ellipse(x,y,34,7,0,0,7);ctx.fill();ctx.stroke();
+  for(const [dx,a] of [[-10,-0.12],[8,0.1]]){ctx.strokeStyle='#c9a77a';ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(x+dx-24,y-2);ctx.lineTo(x+dx+22,y-6+a*20);ctx.stroke();ctx.fillStyle='#9a5a2c';ctx.strokeStyle=UI.s;ctx.lineWidth=2;for(let i=0;i<2;i++){ctx.beginPath();ctx.arc(x+dx-14+i*11,y-4+a*6,5,0,7);ctx.fill();ctx.stroke();}} /* 2本とも、肉が半分だけ残っている */
+  ctx.restore();}
+/* STAGE 06：素材の切り出しで、上げた腕の先（袖口と手）が枠の外で切れているので描き足す（胴の絵と同じ座標で） */
+function drawArmExt(b,fl){const pt=KAR.parts.torso;ctx.save();ctx.translate(b.position.x,b.position.y);ctx.rotate(b.angle);if(fl)ctx.scale(-1,1);partXf(pt,-(R.neck-R.torsoC),R.torsoC);
+  ctx.lineJoin='round';ctx.lineCap='round';ctx.strokeStyle='#191919';ctx.lineWidth=3;
+  ctx.fillStyle='#F4F1EA';ctx.beginPath();ctx.moveTo(3,63);ctx.lineTo(-14,58);ctx.quadraticCurveTo(-20,76,-15,93);ctx.lineTo(3,95);ctx.closePath();ctx.fill();
+  ctx.beginPath();ctx.moveTo(3,63);ctx.lineTo(-14,58);ctx.quadraticCurveTo(-20,76,-15,93);ctx.lineTo(3,95);ctx.stroke(); /* 袖口 */
+  ctx.fillStyle='#E9BE98';ctx.beginPath();ctx.moveTo(-16,62);ctx.quadraticCurveTo(-30,52,-36,40);ctx.quadraticCurveTo(-40,32,-34,30);ctx.quadraticCurveTo(-28,34,-26,44);ctx.lineTo(-24,28);ctx.quadraticCurveTo(-24,20,-18,22);ctx.lineTo(-16,42);ctx.lineTo(-12,26);ctx.quadraticCurveTo(-10,19,-5,22);ctx.lineTo(-8,46);ctx.quadraticCurveTo(-4,60,-12,88);ctx.quadraticCurveTo(-18,80,-16,62);ctx.closePath();ctx.fill();ctx.stroke(); /* 開いた手（店員を呼ぶ手） */
+  ctx.restore();}
+/* 卓の下に見える、座布団とあぐらの脚（卓の脚より奥） */
+function drawLap(x){const y0=TABLE_TOP+18,y1=FLOOR-6;ctx.save();ctx.lineJoin='round';ctx.strokeStyle=UI.s;ctx.lineWidth=3;
+  ctx.fillStyle='#8E3B32';ctx.beginPath();ctx.moveTo(x-60,y1);ctx.lineTo(x+60,y1);ctx.lineTo(x+50,y1-12);ctx.lineTo(x-50,y1-12);ctx.closePath();ctx.fill();ctx.stroke(); /* 座布団 */
+  ctx.fillStyle='#3E4256';ctx.beginPath();ctx.moveTo(x-24,y0);ctx.quadraticCurveTo(x-54,y1-34,x-50,y1-16);ctx.quadraticCurveTo(x,y1-4,x+50,y1-16);ctx.quadraticCurveTo(x+54,y1-34,x+24,y0);ctx.closePath();ctx.fill();ctx.stroke(); /* あぐらの脚 */
+  ctx.beginPath();ctx.moveTo(x-34,y1-19);ctx.quadraticCurveTo(x,y1-30,x+34,y1-19);ctx.stroke();ctx.restore();}
+function drawStaff(s){if(SD.seatBehind&&s.mode!=='rag'&&G.phase!=='smash'){if(SD.seatLap&&G.phase!=='harisen')drawLap(s.P.torso.position.x);ctx.save();ctx.beginPath();ctx.rect(-200,-200,W+400,TABLE_TOP+210);ctx.clip();ctx.translate(0,SD.seatBehind);drawStaff0(s);ctx.restore();return;} /* 卓より下は描かない（脚が卓の下を突き抜けないように） */drawStaff0(s);}
+function drawStaff0(s){
   /* 線画版のSTAGE 16：座っている間は座った絵（大股→膝を閉じる）で描く。成敗中だけ投げ飛ばせる人物 */
-  if(SD.line&&SD.staffSit&&G.phase!=='smash'&&G.phase!=='harisen'){const im=EXT[G.closeLegs?SD.staffSit[1]:SD.staffSit[0]];if(im){const h=G.closeLegs?(SD.staffSit[4]||SD.staffSit[2]):SD.staffSit[2],w=h*im.width/im.height;ctx.save();ctx.translate(SD.sit.x,SD.staffSit[3]);if(s.f<0)ctx.scale(-1,1);ctx.drawImage(im,-w/2,-h,w,h);ctx.restore();return;}}
+  if(SD.line&&SD.staffSit&&G.phase!=='smash'&&G.phase!=='harisen'){const im=EXT[G.closeLegs?SD.staffSit[1]:SD.staffSit[0]];if(im){const h=G.closeLegs?(SD.staffSit[4]||SD.staffSit[2]):SD.staffSit[2],w=h*im.width/im.height;ctx.save();ctx.translate(SD.sit?SD.sit.x:s.x,G.closeLegs&&SD.staffSit[5]?SD.staffSit[5]:SD.staffSit[3]);/* [5]＝足を引いた後の足元の高さ（腰を座面に合わせる） */if(s.f<0)ctx.scale(-1,1);ctx.drawImage(im,-w/2,-h,w,h);ctx.restore();return;}}
   if(s.flashT>0){s.flashT-=1/60;ctx.save();ctx.filter='brightness(2.6) saturate(0)';drawStaffInner(s);ctx.restore();return;}
   drawStaffInner(s);
 }
@@ -1944,7 +2112,7 @@ function drawStaffInner(s){
   dp(P.uarmN,'uarm',22,56);dp(P.farmN,'farm',24,58);}
   const hand=P.farmN,ho=R.farm-R.farmC,hp={x:hand.position.x-ho*Math.sin(hand.angle),y:hand.position.y+ho*Math.cos(hand.angle)};
   if(s.hold==='tray'){if(EXT.top)ctx.drawImage(ART.top,hp.x-50,hp.y-9,100,14);else{ctx.fillStyle='#6B412C';rr(hp.x-46,hp.y-6,92,7,3);ctx.fill();}drawBowlAt(hp.x,hp.y-21,0,12);}
-  else if(s.hold==='slip'){ctx.save();ctx.translate(hp.x,hp.y-8);ctx.rotate(-0.18*(fl?-1:1));rr(-14,-38,28,42,2);ctx.fillStyle='#FFFDF6';ctx.fill();ctx.strokeStyle='#CFC5B5';ctx.lineWidth=1.2;ctx.stroke();
+  else if(s.hold==='slip'){ctx.save();if(SD.line&&G.tableStatic&&G.tableStatic[0]){const t=G.tableStatic[0].position;ctx.translate(t.x-78,t.y-10);}else ctx.translate(hp.x,hp.y-8); /* 線画の人物は手がポケットの中なので、伝票は卓の上に立てる */ctx.rotate(-0.18*(fl?-1:1));rr(-14,-38,28,42,2);ctx.fillStyle='#FFFDF6';ctx.fill();ctx.strokeStyle='#CFC5B5';ctx.lineWidth=1.2;ctx.stroke();
     ctx.fillStyle='#8A8070';ctx.fillRect(-9,-31,18,2);ctx.fillStyle=C.red;ctx.font='900 9px '+FM;ctx.textAlign='center';ctx.fillText(SD.slip.hand,0,-10);ctx.restore();}
   if((s.expr==='dizzy')||(s.mode==='rag'&&s.expr==='gag'&&s.downT>0.5)){const hp2=P.head.position;for(let i=0;i<3;i++){const a=clock*4+i*2.09;star(hp2.x+Math.cos(a)*30,hp2.y-36+Math.sin(a)*7,6,C.yellow);}}
 }
@@ -2022,8 +2190,9 @@ function contactShadow(x,w){ctx.save();ctx.fillStyle='rgba(20,10,5,.30)';ctx.beg
 const NPCC={};
 function npcImg(k){if(NPCC[k])return NPCC[k];const im=EXT['npc_'+k];if(!im)return null;const c=document.createElement('canvas');c.width=im.naturalWidth||im.width;c.height=im.naturalHeight||im.height;const x=c.getContext('2d');x.drawImage(im,0,0);x.globalCompositeOperation='source-atop';x.fillStyle=(LINE_ON||k.indexOf('q_')===0||k.indexOf('r_')===0||k.indexOf('kit_')===0||k.indexOf('pp_')===0)?'rgba(40,36,44,0)':'rgba(28,24,30,0.72)';x.fillRect(0,0,c.width,c.height);return NPCC[k]=c;}
 function npcPos(n){const im=graded(npcImg(n.img));if(!im)return null;const h=n.h||300,w=h*im.width/im.height;return {im,h,w,x:n.x,y:(n.y||FLOOR),top:(n.y||FLOOR)-h*(n.seat&&!n.full?(n.cut||0.5):1)};}
-function drawNpcs(){SD.npcs.forEach((n,i)=>{const q=npcPos(n);if(!q)return;const r=G.npcR&&G.npcR[i];let dy=0,rot=0;if(r){r.t+=1/60;const k=Math.max(0,1-r.t/0.6);dy=-Math.abs(Math.sin(r.t*18))*10*k;rot=Math.sin(r.t*14)*0.06*k;}
+function drawNpcs(){SD.npcs.forEach((n,i)=>{if(n.only&&!(n.only===G.phase||(n.only==='ochi'&&G.phase==='finale')))return;/* その場面にだけ出る人 */const q=npcPos(n);if(!q)return;const r=G.npcR&&G.npcR[i];let dy=0,rot=0;if(r){r.t+=1/60;const k=Math.max(0,1-r.t/0.6);dy=-Math.abs(Math.sin(r.t*18))*10*k;rot=Math.sin(r.t*14)*0.06*k;}
   if(!n.seat&&!n.full&&!n.y)contactShadow(q.x,q.w*0.8);const fl0=(G.npcF&&G.npcF[i]!=null)?G.npcF[i]:n.flip,fl=(LINE_ON&&!n.full)?!fl0:fl0;/* 線画の人物は元から右向き（前の絵は左向き）なので、向きの指定を反転 */ctx.save();ctx.translate(q.x,q.y+dy);ctx.rotate(rot);if(fl)ctx.scale(-1,1);
+  if(n.clipY){ctx.beginPath();ctx.rect(-600,-2000,1200,2000+n.clipY-(q.y+dy));ctx.clip();} /* カウンターの奥に立つ人：カウンターより下は描かない */
   if(n.full){ctx.save();if(n.squeeze&&!G.closeLegs){ctx.rotate(0.05);ctx.translate(6,0);}ctx.drawImage(q.im,-q.w/2,-q.h,q.w,q.h);ctx.restore();
     if(n.squeeze&&!G.closeLegs&&!G.snapMode){ctx.strokeStyle='rgba(25,25,25,0.6)';ctx.lineWidth=2.5;ctx.lineCap='round';for(let k=0;k<3;k++){const yy=-q.h*0.62+k*14;ctx.beginPath();ctx.moveTo(-q.w*0.5-6,yy);ctx.lineTo(-q.w*0.5-18,yy-4);ctx.stroke();}}}
   else if(n.seat){/* 座っている乗客：立ち絵の上半身＋描いた膝下（正面向き・膝をそろえる）。squeeze は大股の隣で縮こまる */const cut=n.cut||0.5,sq=n.squeeze&&!G.closeLegs?1:0,lh=(n.footY||650)-q.y;
@@ -2035,11 +2204,11 @@ function drawNpcs(){SD.npcs.forEach((n,i)=>{const q=npcPos(n);if(!q)return;const
   else ctx.drawImage(q.im,-q.w/2,-q.h,q.w,q.h);ctx.restore();
   if(r&&r.t<1.4&&!G.snapMode){ctx.save();ctx.font='34px '+FD;ctx.textAlign='center';ctx.lineWidth=7;ctx.strokeStyle=UI.s;ctx.strokeText('！',q.x+12,q.top-14);ctx.fillStyle=C.yellow;ctx.fillText('！',q.x+12,q.top-14);ctx.restore();}});}
 /* 主人公：右向きの立ち姿3種（normal 普通／talk 話しかける／trouble 困る）。脳内成敗の間は出さない */
-function heroInfo(){const H0=SD.hero;if(!H0)return null;const k=G.heroPose&&EXT['hero_'+G.heroPose]?G.heroPose:(G.heroBase||'normal');const pre=H0.pre||'';const im=EXT['hero_'+pre+k]||EXT['hero_'+k]||EXT.hero_normal;if(!im)return null;const hb=EXT['hero_'+pre+'normal']||EXT.hero_normal,s=(H0.h||300)/((hb&&(hb.naturalHeight||hb.height))||957);if(H0.seat&&EXT.hero_seat){/* 座った主人公の絵（腰の高さ＝H0.y、f＝絵の中の腰の位置） */const si=EXT.hero_seat,th=H0.sh||H0.h,sw=th*si.naturalWidth/si.naturalHeight;return {im:si,w:sw,h:th,x:H0.x,y:H0.y+(1-(H0.f||0.69))*th,flip:G.heroFlip!=null?G.heroFlip:!!H0.flip};}
+function heroInfo(){const H0=SD.hero;if(!H0)return null;const k=G.heroPose&&EXT['hero_'+G.heroPose]?G.heroPose:(G.heroBase||'normal');const pre=G.heroNoPre?'':(H0.pre||'');const im=EXT['hero_'+pre+k]||EXT['hero_'+k]||EXT.hero_normal;if(!im)return null;const hb=EXT['hero_'+pre+'normal']||EXT.hero_normal,s=(H0.h||300)/((hb&&(hb.naturalHeight||hb.height))||957);if(H0.seat&&EXT.hero_seat){/* 座った主人公の絵（腰の高さ＝H0.y、f＝絵の中の腰の位置） */const si=EXT.hero_seat,th=H0.sh||H0.h,sw=th*si.naturalWidth/si.naturalHeight;return {im:si,w:sw,h:th,x:H0.x,y:H0.y+(1-(H0.f||0.69))*th,flip:G.heroFlip!=null?G.heroFlip:!!H0.flip};}
   const fh=(im.naturalHeight||im.height)*s,ct=H0.seat?(H0.cut||0.47):1;return {im,w:(im.naturalWidth||im.width)*s,h:fh*ct,fh,ct,seat:!!H0.seat,footY:H0.footY,x:H0.x,y:H0.seat?H0.y:FLOOR+2,flip:G.heroFlip!=null?G.heroFlip:!!H0.flip};}
-function drawHero(){if(G.phase==='smash'||(G.phase==='harisen'&&!PUNCH))return;const q=heroInfo();if(!q)return;q.im=graded(q.im);if(!q.seat&&!SD.sit)contactShadow(q.x,q.w);
+function drawHero(){if(G.phase==='smash'||G.phase==='harisen')return; /* 殴る間は画面手前の拳が自分 */const q=heroInfo();if(!q)return;q.im=graded(q.im);if(!q.seat&&!SD.sit)contactShadow(q.x,q.w);
   /* 鏡に映る主人公（STAGE 04）：鏡のガラスの中に、こちら向きで同じ服の姿を少し小さく描く */
-  const M=SD.mirror;if(M){ctx.save();ctx.beginPath();ctx.rect(M.x,M.y,M.w,M.h);ctx.clip();const k2=0.9,rw=q.w*k2,rh=q.h*k2,cx=M.x+M.w*0.5,fy=M.y+M.h-6;ctx.globalAlpha=0.82;ctx.save();if(!q.flip){ctx.translate(cx,0);ctx.scale(-1,1);ctx.translate(-cx,0);}ctx.drawImage(q.im,cx-rw/2,fy-rh,rw,rh);ctx.restore();ctx.globalAlpha=1;ctx.fillStyle='rgba(200,215,230,0.16)';ctx.fillRect(M.x,M.y,M.w,M.h);const g=ctx.createLinearGradient(M.x,M.y,M.x+M.w,M.y+M.h);g.addColorStop(0,'rgba(255,255,255,0.22)');g.addColorStop(0.35,'rgba(255,255,255,0)');ctx.fillStyle=g;ctx.fillRect(M.x,M.y,M.w,M.h);ctx.restore();}
+  const M=SD.mirror;if(M&&q.x-q.w*0.3<M.x+M.w+10){ /* 鏡の前に立っているときだけ映す */ctx.save();ctx.beginPath();ctx.rect(M.x,M.y,M.w,M.h);ctx.clip();const k2=0.9,rw=q.w*k2,rh=q.h*k2,cx=M.x+M.w*0.5,fy=M.y+M.h-6;ctx.globalAlpha=0.82;ctx.save();if(!q.flip){ctx.translate(cx,0);ctx.scale(-1,1);ctx.translate(-cx,0);}ctx.drawImage(q.im,cx-rw/2,fy-rh,rw,rh);ctx.restore();ctx.globalAlpha=1;ctx.fillStyle='rgba(200,215,230,0.16)';ctx.fillRect(M.x,M.y,M.w,M.h);const g=ctx.createLinearGradient(M.x,M.y,M.x+M.w,M.y+M.h);g.addColorStop(0,'rgba(255,255,255,0.22)');g.addColorStop(0.35,'rgba(255,255,255,0)');ctx.fillStyle=g;ctx.fillRect(M.x,M.y,M.w,M.h);ctx.restore();}
   if(q.seat){/* 座った主人公：上半身＋膝下（正面向き） */const lh=(q.footY||q.y+80)-q.y,kw=q.w*0.15;ctx.save();ctx.translate(q.x,q.y);
     ctx.fillStyle='#4A5A78';for(const sx of [-kw*0.55,kw*0.55]){rr(sx-kw*0.42,4,kw*0.84,lh-8,kw*0.4);ctx.fill();}
     ctx.fillStyle='#F2EEE6';for(const sx of [-kw*0.55,kw*0.55]){ctx.beginPath();ctx.ellipse(sx,lh-4,kw*0.62,kw*0.32,0,0,7);ctx.fill();}
@@ -2049,7 +2218,7 @@ function drawHero(){if(G.phase==='smash'||(G.phase==='harisen'&&!PUNCH))return;c
   /* 店員の目線：頭から足元へ、じろっと見る帯 */
   if(G.scan&&G.phase==='intro'){G.scan.t+=1/60;const u=G.scan.t/G.scan.d;if(u>=1)G.scan=null;else{const e=u<0.5?u*2:2-u*2,yy=q.y-q.h+q.h*(0.05+0.9*(u<0.5?u*2:1-(u-0.5)*0.3));ctx.save();const g2=ctx.createLinearGradient(0,yy-22,0,yy+22);g2.addColorStop(0,'rgba(239,77,56,0)');g2.addColorStop(0.5,'rgba(239,77,56,0.55)');g2.addColorStop(1,'rgba(239,77,56,0)');ctx.fillStyle=g2;ctx.fillRect(q.x-q.w*0.7,yy-22,q.w*1.4,44);ctx.restore();}}
   if(G.phase==='intro'&&G.phaseT<5.5&&!G.snapMode&&!G.thumb){const a=Math.min(1,(5.5-G.phaseT)/0.6);ctx.save();ctx.globalAlpha=a;ctx.font='700 13px '+FZ;const t='あなた';const tw=ctx.measureText(t).width+20,bx=q.x-tw/2,by=q.y-q.h-40;rr(bx,by,tw,24,12);ctx.fillStyle=UI.r;ctx.fill();ctx.fillStyle=UI.k;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(t,q.x,by+12);ctx.beginPath();ctx.moveTo(q.x-6,by+24);ctx.lineTo(q.x+6,by+24);ctx.lineTo(q.x,by+31);ctx.fill();ctx.restore();}}
-/* 雪見だいふく（STAGE 09）：2個入りの容器・中身・スプーンを、机の上と拡大コマの両方で同じ絵で描く */
+/* 2個入りアイス（STAGE 09）：2個入りの容器・中身・スプーンを、机の上と拡大コマの両方で同じ絵で描く */
 function drawMochiAt(cx,by,k,n){ctx.save();ctx.translate(cx,by);ctx.scale(k,k);
   ctx.fillStyle='rgba(0,0,0,0.18)';ctx.beginPath();ctx.ellipse(0,2,44,6,0,0,7);ctx.fill();
   rr(-40,-16,80,16,5);ctx.fillStyle='#F4F1EA';ctx.fill();ctx.strokeStyle='#C9C2B4';ctx.lineWidth=1.2;ctx.stroke();
@@ -2059,14 +2228,44 @@ function drawMochiAt(cx,by,k,n){ctx.save();ctx.translate(cx,by);ctx.scale(k,k);
   ctx.save();ctx.translate(48,-4);ctx.rotate(-0.25);ctx.fillStyle='#F0A3B4';rr(-2,-3,26,5,2.5);ctx.fill();ctx.beginPath();ctx.ellipse(-4,-0.5,6,4,0,0,7);ctx.fill();ctx.restore();
   ctx.restore();}
 function drawMochi(){const m=SD.mochi;drawMochiAt(m.x,TABLE_TOP-2,1,G.mochiN==null?2:G.mochiN);}
-/* 拡大コマ：手元の雪見だいふくをアップで見せる（2個しかない、が一目で分かる） */
+/* 拡大コマ：手元の2個入りアイスをアップで見せる（2個しかない、が一目で分かる） */
 function drawInset(){const c=G.inset;if(!c)return;c.t+=1/60;if(c.t>c.d){G.inset=null;return;}const a=Math.min(1,c.t/0.18,(c.d-c.t)/0.25),sc=0.9+0.1*Math.min(1,c.t/0.18);
   ctx.save();ctx.globalAlpha=a;ctx.translate(W/2,330);ctx.rotate(-0.03);ctx.scale(sc,sc);
   ctx.fillStyle='#191919';ctx.fillRect(-206,-116,412,232);ctx.fillStyle='#F3EFE6';ctx.fillRect(-200,-110,400,220);
   drawMochiAt(0,62,3.2,G.mochiN==null?2:G.mochiN);
-  ctx.save();ctx.translate(140,-70);ctx.rotate(0.12);ctx.font='900 22px '+FZ;const lw=ctx.measureText(c.label||'2個入り').width+28;ctx.translate(46-lw/2,0);ctx.strokeStyle='#EF4D38';ctx.lineWidth=3;rr(-lw/2,-20,lw,40,8);ctx.stroke();ctx.fillStyle='#EF4D38';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(c.label||'2個入り',0,1);ctx.restore();
+  ctx.save();ctx.translate(140,-70);ctx.rotate(0.12);ctx.font='900 22px '+FZ;const lw=ctx.measureText(c.label||'二個入り').width+28;ctx.translate(46-lw/2,0);ctx.strokeStyle='#EF4D38';ctx.lineWidth=3;rr(-lw/2,-20,lw,40,8);ctx.stroke();ctx.fillStyle='#EF4D38';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(c.label||'二個入り',0,1);ctx.restore();
   ctx.restore();}
-function drawGlow(){if(!G.glow)return;const f=G.staff.P.farmN,ho=R.farm-R.farmC,tp=G.staff.P.torso.position,ln=SD.line,x=ln?tp.x-G.staff.f*14:f.position.x-ho*Math.sin(f.angle),y=ln?tp.y-18:f.position.y+ho*Math.cos(f.angle),/* 線画の人物は腕が胴の絵に含まれるので、胸の前を光らせる */r=90+70*G.glow,fl=0.85+0.15*Math.sin(clock*9);
+/* 線画の人物は腕が絵に含まれているので、口元・手元の位置を胴から割り出す（胸から煙や光が出ないように） */
+function mouthAt(){const s=G.staff,hp=s.P.head.position;return {x:hp.x+s.f*7,y:hp.y+18};} /* 口元は頭の動きについていく */
+function smokeAt(){const s=G.staff;if(SD.line&&s.mode!=='rag'){const m=mouthAt();return {x:m.x-s.f*18,y:m.y};}const f=s.P.farmN,ho=R.farm-R.farmC;return {x:f.position.x-ho*Math.sin(f.angle),y:f.position.y+ho*Math.cos(f.angle)-6};}
+function phoneAt(){const s=G.staff,tp=s.P.torso.position;if(SD.line&&s.mode!=='rag')return G.glow==='w'?{x:tp.x-s.f*30,y:tp.y+40}:{x:tp.x-s.f*6,y:tp.y+52};const f=s.P.farmN,ho=R.farm-R.farmC;return {x:f.position.x-ho*Math.sin(f.angle),y:f.position.y+ho*Math.cos(f.angle)};}
+function drawCig(){if(!SD.smoke||!G.staff||G.staff.mode==='rag'||!SD.line)return;const m=mouthAt(),d=G.staff.f;ctx.save();ctx.lineCap='round';ctx.strokeStyle=UI.s;ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(m.x-d*4,m.y);ctx.lineTo(m.x-d*16,m.y+2);ctx.stroke();ctx.strokeStyle='#f4efe6';ctx.lineWidth=2.6;ctx.stroke();ctx.fillStyle='#ff7a3c';ctx.beginPath();ctx.arc(m.x-d*17,m.y+2,2.2,0,7);ctx.fill();ctx.restore();} /* 口元のタバコ */
+/* 台本の「一枚見せる」表示：伝票・スマホのトーク・棚・一時停止・ホワイトボード・炊飯器の表示・付箋（画面の中央上） */
+function drawNote(){const n=G.note;if(!n||G.snapMode)return;const k=Math.min(1,n.t/0.18),out=n.t>n.d?Math.max(0,1-(n.t-n.d)/0.3):1;
+  const rows=n.rows||[],st=n.style,w=st==='sticky'?210:st==='display'?250:st==='pause'?230:300,h=st==='sticky'?150:st==='pause'?130:(n.title?66:30)+rows.length*36+10;
+  const R2=(x,y,ww,hh,r)=>{ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+ww,y,x+ww,y+hh,r);ctx.arcTo(x+ww,y+hh,x,y+hh,r);ctx.arcTo(x,y+hh,x,y,r);ctx.arcTo(x,y,x+ww,y,r);ctx.closePath();};
+  let bg='#FFFDF6',fg='#191919';if(st==='phone'){bg='#22252B';fg='#F4F1EA';}if(st==='display'){bg='#2F3B2F';fg='#B8F5A0';}if(st==='sticky')bg='#FFE873';if(st==='pause'){bg='rgba(20,20,26,0.94)';fg='#FFFFFF';}
+  ctx.save();ctx.globalAlpha=out;ctx.translate(W/2,H*0.34);const sc=0.85+0.15*k;ctx.scale(sc,sc);if(st==='sticky')ctx.rotate(-0.04);
+  ctx.shadowColor='rgba(0,0,0,.35)';ctx.shadowBlur=14;ctx.fillStyle=bg;R2(-w/2,-h/2,w,h,st==='phone'?22:st==='sticky'?3:10);ctx.fill();ctx.shadowBlur=0;ctx.lineWidth=3;ctx.strokeStyle='#191919';ctx.stroke();
+  ctx.textBaseline='middle';ctx.fillStyle=fg;
+  if(st==='pause'){ctx.fillStyle=fg;ctx.fillRect(-24,-36,16,44);ctx.fillRect(8,-36,16,44);ctx.font='800 20px '+FZ;ctx.textAlign='center';ctx.fillText(n.title||'一時停止中',0,34);ctx.restore();return;}
+  if(st==='sticky'){ctx.font='900 24px '+FZ;ctx.textAlign='center';const ls=rows[0]||[];ls.forEach((l,i)=>ctx.fillText(l,0,(i-(ls.length-1)/2)*36));ctx.restore();return;}
+  if(st==='display'){ctx.font='700 13px '+FZ;ctx.textAlign='center';ctx.fillStyle='#E8E4DA';ctx.fillText(n.title||'',0,-h/2-12);ctx.fillStyle=fg;ctx.font='900 30px '+FZ;ctx.fillText((rows[0]||[]).join('　'),0,6);ctx.restore();return;}
+  if(n.title){ctx.font='800 17px '+FZ;ctx.textAlign='center';ctx.fillText(n.title,0,-h/2+28);}
+  const y0=-h/2+(n.title?66:28);
+  rows.forEach((r,i)=>{const y=y0+i*36;
+    if(st==='phone'){ctx.font='600 11px '+FZ;ctx.textAlign='left';ctx.fillStyle='#9AA0A8';ctx.fillText(r[0],-w/2+14,y);const mine=i!==rows.length-1;ctx.font='700 14px '+FZ;const tw=ctx.measureText(r[1]).width+20,bx=mine?w/2-14-tw:-w/2+58;ctx.fillStyle=mine?'#7BD36A':'#E9E9EC';R2(bx,y-14,tw,28,13);ctx.fill();ctx.fillStyle='#191919';ctx.fillText(r[1],bx+10,y);return;}
+    ctx.font='700 17px '+FZ;ctx.textAlign='left';ctx.fillStyle=fg;ctx.fillText(r[0],-w/2+22,y);ctx.textAlign='right';ctx.fillText(r[1],w/2-22,y);
+    if(r[2]){const tw=ctx.measureText(r[1]).width,k2=Math.min(1,Math.max(0,(n.t-0.6)/0.4));ctx.strokeStyle='#D33A2C';ctx.lineWidth=2.5;for(const dy of [-3,3]){ctx.beginPath();ctx.moveTo(w/2-26-tw,y+dy);ctx.lineTo(w/2-26-tw+(tw+8)*k2,y+dy);ctx.stroke();}}
+    if(st==='receipt'&&i===rows.length-2){ctx.strokeStyle='rgba(25,25,25,.35)';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(-w/2+16,y+18);ctx.lineTo(w/2-16,y+18);ctx.stroke();}
+    if(st==='shelf'&&r[0]==='32番'&&n.t>1.0){ctx.strokeStyle='#D33A2C';ctx.lineWidth=3;R2(-w/2+10,y-15,w-20,30,6);ctx.stroke();}});
+  ctx.restore();}
+/* STAGE 11：後ろの席の人が、スマホの人の肩をトントンとたたく手 */
+function drawTap(){const t=G.tap;if(!t||G.snapMode)return;const x1=(SD.sit?SD.sit.x:G.staff.P.torso.position.x)+24,y1=(SD.staffSit?SD.staffSit[3]-SD.staffSit[2]*0.72:G.staff.P.torso.position.y-40)+Math.abs(Math.sin(t.t*9))*-6,x0=W+20,y0=y1-130;
+  ctx.save();ctx.lineCap='round';ctx.strokeStyle=UI.s;ctx.lineWidth=27;ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x1+12,y1-8);ctx.stroke();ctx.strokeStyle='#5E6A7E';ctx.lineWidth=21;ctx.stroke();
+  ctx.fillStyle='#E8BE9C';ctx.strokeStyle=UI.s;ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(x1,y1,13,10,-0.6,0,7);ctx.fill();ctx.stroke();ctx.restore();}
+function drawPhone(){if(!G.glow||!G.staff||G.staff.mode==='rag'||!SD.line)return;if(G.glow==='w'){const p=phoneAt();ctx.save();ctx.fillStyle='#3a3a40';ctx.strokeStyle=UI.s;ctx.lineWidth=2;ctx.beginPath();ctx.arc(p.x,p.y,6,0,7);ctx.fill();ctx.stroke();ctx.fillStyle='#dff0ff';ctx.beginPath();ctx.arc(p.x,p.y,3.5,0,7);ctx.fill();ctx.restore();return;} /* 腕時計 */const p=phoneAt();ctx.save();ctx.translate(p.x,p.y);ctx.rotate(-0.25*G.staff.f);ctx.fillStyle='#1d1d22';ctx.strokeStyle=UI.s;ctx.lineWidth=3;ctx.beginPath();ctx.roundRect?ctx.roundRect(-16,-26,32,52,5):ctx.rect(-16,-26,32,52);ctx.fill();ctx.stroke();ctx.fillStyle='#e8f2ff';ctx.fillRect(-12,-21,24,42);ctx.fillStyle='#9fc4ff';for(let i=0;i<3;i++)ctx.fillRect(-9,-16+i*9,18,5); /* 画面に文字の行（スマホと分かるように大きく） */ctx.restore();} /* 手元のスマホ */
+function drawGlow(){if(!G.glow)return;const ph=phoneAt(),x=ph.x,y=ph.y,r=G.glow==='w'?60:90+70*G.glow,fl=0.85+0.15*Math.sin(clock*9);
   ctx.save();ctx.globalCompositeOperation='lighter';const g=ctx.createRadialGradient(x,y,4,x,y,r);g.addColorStop(0,'rgba(235,245,255,'+(0.75*fl)+')');g.addColorStop(0.3,'rgba(200,220,255,'+(0.28*fl)+')');g.addColorStop(1,'rgba(200,220,255,0)');ctx.fillStyle=g;ctx.fillRect(x-r,y-r,r*2,r*2);ctx.restore();}
 function drawGrab(){const g=G.grab;if(!g)return;const b=g.body,c=g.c,pb=rot(b.angle-(c.angleB||0),c.pointB.x,c.pointB.y),bx=b.position.x+pb.x,by=b.position.y+pb.y;
   ctx.save();ctx.strokeStyle='rgba(255,250,240,.75)';ctx.lineWidth=3;ctx.setLineDash([6,5]);ctx.beginPath();ctx.moveTo(c.pointA.x,c.pointA.y);ctx.lineTo(bx,by);ctx.stroke();ctx.setLineDash([]);
@@ -2140,8 +2339,8 @@ function drawHUD(){
   ctx.fillStyle=UI.s;ctx.font='900 14px '+FZ;ctx.fillText(nm,28,top+31,236);
   // スコア（smash は損害額）
   if(SMASHLIKE()&&G.damage!=null){G.dispDmg+=(G.damage-G.dispDmg)*0.18;if(Math.abs(G.damage-G.dispDmg)<1)G.dispDmg=G.damage;}
-  const sm=SMASHLIKE()&&G.damage!=null,sc=sm?'¥'+Math.round(G.dispDmg).toLocaleString('ja-JP'):Math.round(G.disp).toLocaleString('ja-JP');ctx.font='700 24px '+FP;const sw=Math.max(110,ctx.measureText(sc).width+30);card(W-14-sw,top,sw,46);
-  if(sm){ctx.fillStyle=UI.s;ctx.font='700 9.5px '+FZ;ctx.textAlign='right';ctx.textBaseline='middle';ctx.fillText('妄想修理代',W-28,top+12);}ctx.font='700 '+(sm?21:24)+'px '+FP;ctx.fillStyle=sm?UI.r:UI.s;ctx.textAlign='right';ctx.textBaseline='middle';ctx.fillText(sc,W-28,top+(sm?30:24));
+  const sm=SMASHLIKE()&&G.damage!=null;if(sm){const f=feelScore();G.dispFeel=(G.dispFeel||0)+(f-(G.dispFeel||0))*0.2;if(Math.abs(f-G.dispFeel)<1)G.dispFeel=f;}const sc=sm?Math.round(G.dispFeel||0).toLocaleString('ja-JP'):Math.round(G.disp).toLocaleString('ja-JP');ctx.font='700 24px '+FP;const sw=Math.max(110,ctx.measureText(sc).width+30);card(W-14-sw,top,sw,46);
+  if(sm){ctx.fillStyle=UI.s;ctx.font='700 9.5px '+FZ;ctx.textAlign='right';ctx.textBaseline='middle';ctx.fillText('爽快スコア',W-28,top+12);}ctx.font='700 '+(sm?21:24)+'px '+FP;ctx.fillStyle=sm?UI.r:UI.s;ctx.textAlign='right';ctx.textBaseline='middle';ctx.fillText(sc,W-28,top+(sm?30:24));
   // 残り時間：細い線＋秒数
   if(G.phase==='throw'){const f=G.throwLeft/THROW_TIME,warn=G.throwLeft<4;ctx.fillStyle='rgba(25,25,25,.5)';ctx.fillRect(14,top+60,W-28,4);ctx.fillStyle=warn?UI.r:UI.k;ctx.fillRect(14,top+60,Math.max(4,(W-28)*f),4);
     ctx.font='600 13px '+FP;ctx.textAlign='right';ctx.fillStyle=warn?UI.r:UI.k;ctx.lineWidth=3;ctx.strokeStyle='rgba(25,25,25,.6)';ctx.strokeText(Math.ceil(G.throwLeft)+'s',W-14,top+80);ctx.fillText(Math.ceil(G.throwLeft)+'s',W-14,top+80);}
@@ -2150,7 +2349,7 @@ function drawHUD(){
     ctx.font='600 13px '+FP;ctx.textAlign='left';ctx.textBaseline='middle';ctx.lineWidth=3;ctx.strokeStyle='rgba(25,25,25,.75)';const t1=(PUNCH?'パンチ ':'ツッコミ ')+G.hits+'回';ctx.strokeText(t1,14,y+22);ctx.fillStyle=UI.k;ctx.fillText(t1,14,y+22);
     ctx.textAlign='right';const t2=Math.ceil(G.hariT)+'s';ctx.strokeText(t2,W-14,y+22);ctx.fillStyle=warn?UI.r:UI.k;ctx.fillText(t2,W-14,y+22);
     HARI_STARS.forEach((x,i)=>{ctx.font='14px '+FD;ctx.textAlign='center';const sx=W/2-30+i*30;ctx.lineWidth=4;ctx.strokeStyle=UI.s;ctx.strokeText('★',sx,y+22);ctx.fillStyle=G.hits>=x?C.yellow:'rgba(243,239,230,.45)';ctx.fillText('★',sx,y+22);});
-    if(G.combo>=2&&G.time-G.lastHitT<0.6){const k=1+0.1*Math.sin(clock*22),sz=Math.round(Math.min(90,36+G.combo*2));ctx.save();ctx.translate(W/2,top+170);ctx.scale(k,k);ctx.font=sz+'px '+FD;ctx.textAlign='center';ctx.lineJoin='round';ctx.lineWidth=sz*0.22;ctx.strokeStyle=UI.s;const ct=G.combo+'連打';ctx.strokeText(ct,0,0);ctx.fillStyle=G.combo>=20?UI.r:G.combo>=10?C.yellow:UI.k;ctx.fillText(ct,0,0);ctx.restore();}
+    if(G.combo>=2&&G.time-G.lastHitT<0.6){const k=1+0.1*Math.sin(clock*22),sz=Math.round(Math.min(58,30+G.combo*1.2));ctx.save();ctx.translate(W/2,top+118);ctx.scale(k,k);ctx.font=sz+'px '+FD;ctx.textAlign='center';ctx.lineJoin='round';ctx.lineWidth=sz*0.22;ctx.strokeStyle=UI.s;const ct=G.combo+'連打';ctx.strokeText(ct,0,0);ctx.fillStyle=G.combo>=20?UI.r:G.combo>=10?C.yellow:UI.k;ctx.fillText(ct,0,0);ctx.restore();}
     if(G.hits<3)chip(PUNCH?'タップで殴る！ 輪が小さくなった瞬間ならクリティカル':'相手をタップ連打で、ハリセンツッコミ！',W/2,H-110,true);}
   // 店ごとぶっ壊す：残り投げ数・破壊率（★の目盛り）・ブチギレ・チャレンジ
   if(G.phase==='smash'&&G.totalValue){const y=top+58,bw=W-28,pc=pctNow(),SP=(SD.starPct||STAR_PCT);
@@ -2222,7 +2421,7 @@ function slipCardDraw(){
   ctx.fillStyle='rgba(25,25,25,.6)';ctx.font='500 11px '+FP;ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(SD.slip.title,-66,-40);
   ctx.setLineDash([3,3]);ctx.strokeStyle='rgba(25,25,25,.4)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(-66,-28);ctx.lineTo(62,-28);ctx.stroke();ctx.setLineDash([]);
   ctx.fillStyle=UI.s;ctx.font='900 15px '+FZ;ctx.fillText(SD.slip.item,-66,-2);ctx.textAlign='right';ctx.font='600 22px '+FP;ctx.fillStyle=UI.r;ctx.fillText(SD.slip.hand,62,-2);
-  ctx.fillStyle='rgba(25,25,25,.7)';ctx.font='500 11px '+FZ;ctx.textAlign='left';ctx.fillText(SD.slip.note,-66,24);ctx.font='500 9px '+FZ;ctx.fillText('※お通しはお断りできません',-66,44);ctx.restore();
+  ctx.fillStyle='rgba(25,25,25,.7)';ctx.font='500 11px '+FZ;ctx.textAlign='left';ctx.fillText(SD.slip.note,-66,24);ctx.restore();
 }
 function grade(){
   ctx.save();ctx.globalCompositeOperation='lighter';const g=ctx.createRadialGradient(170,680,20,170,680,330);g.addColorStop(0,'rgba(255,170,80,0.13)');g.addColorStop(1,'rgba(255,140,60,0)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);ctx.restore();
@@ -2232,27 +2431,31 @@ function render(){
   ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#120f0e';ctx.fillRect(0,0,cv.width,cv.height);if(!G||!BG)return;
   const k=scale*dpr,sh=REDUCED?0:G.shake,sx=(Math.random()-0.5)*sh,sy=(Math.random()-0.5)*sh;
   ctx.setTransform(k,0,0,k,0,0);ctx.translate(W/2+sx,H/2+sy);ctx.scale(G.zoom,G.zoom);ctx.translate(-G.camX,-G.camY);
-  ctx.drawImage(BG,0,0,W,H);if(!BG.ext)drawNoren();if(G.holes)drawHoles();if(G.tears)drawTears();
+  ctx.drawImage(BG,0,0,W,H);if((stageNo===15||stageNo===12)&&SD.bg==='bg_office'&&G.clockHM)paintClock(ctx,265,390,G.clockHM[0],G.clockHM[1],22);if(!BG.ext)drawNoren(); /* 壁時計を場面の時刻（17:50→17:52→18:00）に合わせて動かす */if(G.holes)drawHoles();if(G.tears)drawTears();
   for(const p of G.parts)if(p.type==='steam'){const a=clamp(p.life/p.max,0,1);ctx.fillStyle='rgba(255,245,231,'+(Math.sin(a*Math.PI)*0.1)+')';ctx.beginPath();ctx.arc(p.x,p.y,p.size*(1.5-a*0.5),0,7);ctx.fill();}
   for(const b of G.props){if(b.gen){if(b.rope){ctx.strokeStyle='#201B1B';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(b.rope.pointA.x,b.rope.pointA.y);ctx.lineTo(b.position.x,b.position.y-b.spr[2]/2);ctx.stroke();}drawBody(b,ART[b.spr[0]],b.spr[1],b.spr[2]);continue;}if(b.isLantern)drawLantern(b);else if(b.isCat)drawBody(b,ART.cat,48,58);else drawBody(b,ART.jug,44,56);}
   if(G.dim>0){ctx.fillStyle='rgba(10,5,3,'+Math.min(0.6,G.dim)+')';ctx.fillRect(-50,-50,W+100,H+100);}
   const bk=G.phase==='ochi'&&SD.ochiBehind;if(bk){shadows();drawStaff(G.staff);}
   if(SD.npcs)drawNpcs();
   if(SD.hero&&!SD.hero.front)drawHero();
-  if(!bk){shadows();drawStaff(G.staff);}drawTable();if(SD.mochi&&!G.tableDyn)drawMochi();
+  const upFront=SD.staffSit&&(G.phase==='harisen'||G.phase==='smash'); /* 座席から立った相手は、座席の荷物より手前に描く（脚が荷物に隠れて切れて見えないように） */
+  if(!bk&&!upFront){shadows();drawStaff(G.staff);}drawTable();if(SD.mochi&&!G.tableDyn)drawMochi();
   if(G.bowl)drawBowlAt(G.bowl.position.x,G.bowl.position.y,G.bowl.angle,G.bowl.proj?0:G.popLeft*2+2);
   for(const b of G.items)drawItem(b);
+  if(!bk&&upFront){shadows();drawStaff(G.staff);}
   if(SD.hero&&SD.hero.front)drawHero();
+  if(SD.mics)drawMics();
+  if(SD.holdProp)drawHeldProp();if(stageNo===13&&SD.projectile&&G.phase!=='smash'&&G.phase!=='harisen'){const k=SD.projectile.key,im=ART[k+'_line']||ART[k]||EXT[k];if(im)ctx.drawImage(im,358,659-52,60,52);} /* 現実の場面では、炊飯器は台所の台の上にある（背景の炊飯器は消してあるので描き足す） */if(stageNo===1&&G.phase==='ochi'&&!G.bowl&&G.tableStatic&&G.tableStatic[0])drawBowlAt(G.tableStatic[0].position.x+40,TABLE_TOP-15,0,0);if(SD.yakitori&&!G.tableDyn)drawYakitori();
   if(G.debris)drawDebris();
   for(const c of G.popcorn){ctx.save();ctx.translate(c.position.x,c.position.y);ctx.rotate(c.angle);ctx.drawImage(ART[c.kind],-7,-7,14,14);ctx.restore();}
   if(G.words||G.wordBodies)drawWords();
   if(ART.fg)ctx.drawImage(ART.fg,0,0,W,H); // 前景：物理物より手前、エフェクト・吹き出し・UIより奥
-  drawGlow();drawParticles();if(!G.snapMode){drawComics();worldCue();}
-  if(!G.snapMode)for(const p of G.popups){ctx.save();ctx.globalAlpha=Math.min(1,p.t*2.2);ctx.textBaseline='middle';
-    if(p.amt){/* 壊した物の札：白い札に墨の枠、金額は朱 */const fA=(p.big?'800 19px ':'800 15px ')+FZ,fN=(p.big?'700 14px ':'700 12px ')+FZ;ctx.font=fA;const wa=ctx.measureText(p.amt).width;ctx.font=fN;const lb=p.label||p.name,wn=ctx.measureText(lb).width;const bw=wa+wn+26,bh=p.big?32:26,vl=G.camX-W/(2*G.zoom),vr=G.camX+W/(2*G.zoom),px=clamp(p.x,vl+bw/2+10,vr-bw/2-10),bx=px-bw/2,by=p.y-bh/2;
-      const pop=Math.min(1,(1.1-p.t)/0.12+0.6);ctx.translate(px,p.y);ctx.scale(pop,pop);ctx.translate(-px,-p.y);
+  drawCig();drawGlow();drawPhone();drawTap();drawParticles();if(!G.snapMode){drawComics();worldCue();}
+  let amtI=0;if(!G.snapMode)for(const p of G.popups){ctx.save();ctx.globalAlpha=Math.min(1,p.t*2.2);ctx.textBaseline='middle';
+    if(p.amt){/* 壊した物の札：白い札に墨の枠、金額は朱 */const bg2=p.big||G.phase==='harisen'||G.phase==='smash',fA=(bg2?'800 19px ':'800 15px ')+FZ,fN=(bg2?'700 14px ':'700 12px ')+FZ;ctx.font=fA;const wa=ctx.measureText(p.amt).width;ctx.font=fN;const lb=p.label||p.name,wn=ctx.measureText(lb).width;const bw=wa+wn+26,bh=bg2?32:26,vl=G.camX-W/(2*G.zoom),vr=G.camX+W/(2*G.zoom),fixed=(G.phase==='harisen'||G.phase==='smash'),vt=(G.camY!=null?G.camY:H/2)-H/(2*G.zoom),py=fixed?vt+(H*0.22+(amtI++)*38)/G.zoom:p.y,px=fixed?vl+bw/2+14/G.zoom:clamp(p.x,vl+bw/2+10,vr-bw/2-10),bx=px-bw/2,by=py-bh/2; /* 殴る・飛ばす間は、金額の札を左上の列に並べる（下から出る拳や、中央の効果音と重ならないように） */
+      const pop=Math.min(1,(1.1-p.t)/0.12+0.6);ctx.translate(px,py);ctx.scale(pop,pop);ctx.translate(-px,-py);
       rr(bx,by,bw,bh,bh/2);ctx.fillStyle='#FFFFFF';ctx.fill();ctx.lineWidth=2.2;ctx.strokeStyle=UI.s;ctx.stroke();
-      ctx.textAlign='left';ctx.font=fA;ctx.fillStyle=UI.r;ctx.fillText(p.amt,bx+10,p.y+1);ctx.font=fN;ctx.fillStyle=UI.s;ctx.fillText(lb,bx+16+wa,p.y+1);}
+      ctx.textAlign='left';ctx.font=fA;ctx.fillStyle=UI.r;ctx.fillText(p.amt,bx+10,py+1);ctx.font=fN;ctx.fillStyle=UI.s;ctx.fillText(lb,bx+16+wa,py+1);}
     else{ctx.font=(p.big?'800 18px ':'800 14px ')+FZ;ctx.textAlign='center';ctx.lineJoin='round';ctx.lineWidth=5;ctx.strokeStyle='#FFFFFF';const hw2=ctx.measureText(p.text).width/2,px=clamp(p.x,hw2+20,W-hw2-20);ctx.strokeText(p.text,px,p.y);ctx.fillStyle=p.big?UI.r:UI.s;ctx.fillText(p.text,px,p.y);}
     ctx.restore();}
   if(SD.projectile&&G.phase==='smash'){const P=SD.projectile;if(G.shotBody)drawBody(G.shotBody,ART[P.key],P.w,P.h);
@@ -2267,11 +2470,12 @@ function render(){
   // 吹き出しは画面座標で描く（顔に寄っても文字が巨大化・はみ出ししないように）
   const toS=(x,y)=>({x:(x-G.camX)*G.zoom+W/2+sx,y:(y-G.camY)*G.zoom+H/2+sy});
   if(!G.snapMode)for(const b of G.bubbles){if(b.who==='staff'){const h=G.staff.P.head.position,p=toS(h.x-10,h.y+R.headC-R.headTop*(KAR?headK():1)+4);drawBubble(p.x,p.y-6*G.zoom,b.text,false,b.age);}else if(b.who==='npc'){const n=SD.npcs&&SD.npcs[b.i],q=n&&npcPos(n);if(q){const p=toS(q.x,q.top-6);drawBubble(p.x,p.y,b.text,false,b.age);}}else{const hq=SD.hero&&G.phase!=='smash'&&heroInfo();const p=hq?toS(hq.x+10,hq.y-hq.h-4):toS(110,TABLE_TOP-70);drawBubble(p.x,p.y,b.text,true,b.age);}}
-  slipCardDraw();
+  slipCardDraw();drawNote();
   if(G.lb>0&&!G.snapMode&&!G.thumb){const h=78*G.lb;ctx.fillStyle='#000';ctx.fillRect(0,0,W,h);ctx.fillRect(0,H-h,W,h);ctx.globalAlpha=G.lb;ctx.fillStyle=UI.k;ctx.font='500 13px '+FP;ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(stageLabel(stageNo)+'　'+SD.scene,22,H-h/2);ctx.globalAlpha=1;}
   else if(G.running&&G.phase!=='finale'&&!G.snapMode&&!G.thumb)drawHUD();
   if(G.cutin)drawCutin(G.cutin);
   if(G.flash>0){ctx.fillStyle='rgba(255,250,240,'+(G.flash/0.16*0.85)+')';ctx.fillRect(0,0,W,H);}
+  if(G.fadeB>0){ctx.fillStyle='rgba(0,0,0,'+Math.min(1,G.fadeB/0.3)+')';ctx.fillRect(0,0,W,H);} /* 成敗から日常へ：短い暗転 */
   if(G.stampT>=0.45&&G.stampT<2.5){const t=G.stampT-0.45,sc=t<0.12?2.6-t/0.12*1.6:1,al=t>1.7?Math.max(0,1-(t-1.7)/0.35):1;
     // TOPと同じロゴを、生成りの札に載せて叩きつける
     ctx.save();ctx.globalAlpha=al;ctx.translate(W*0.46,H*0.7);ctx.rotate(-0.06);ctx.scale(sc*0.86,sc*0.86); // 札は下寄り：吹き飛ぶ相手の顔を隠さない
@@ -2283,29 +2487,29 @@ function render(){
 /* ================= result & flow ================= */
 function starGet(n){try{return parseInt(localStorage.getItem('seibai_s'+String(n||stageNo).padStart(2,'0')+'_stars')||'0',10)||0;}catch(e){return 0;}}
 function starSet(v){try{if(v>starGet())localStorage.setItem('seibai_s'+String(stageNo).padStart(2,'0')+'_stars',String(v));}catch(e){}}
-function bestGet(){try{return parseInt(localStorage.getItem('seibai_s'+String(stageNo).padStart(2,'0')+(GAME_MODE==='smash'?'_smash':GAME_MODE==='harisen'?'_hari':'')+'_best')||'0',10)||0;}catch(e){return 0;}}
-function bestSet(v){try{localStorage.setItem('seibai_s'+String(stageNo).padStart(2,'0')+(GAME_MODE==='smash'?'_smash':GAME_MODE==='harisen'?'_hari':'')+'_best',String(v));}catch(e){}}
+function bestGet(){try{return parseInt(localStorage.getItem('seibai_s'+String(stageNo).padStart(2,'0')+(GAME_MODE==='smash'?'_smash':GAME_MODE==='harisen'?'_hari':'')+'_feel')||'0',10)||0;}catch(e){return 0;}}
+function bestSet(v){try{localStorage.setItem('seibai_s'+String(stageNo).padStart(2,'0')+(GAME_MODE==='smash'?'_smash':GAME_MODE==='harisen'?'_hari':'')+'_feel',String(v));/* 爽快スコアの自己ベスト（以前の修理代の記録とは別に保存） */}catch(e){}}
 function featTitle(st){if(G.lose)return '泣き寝入り';
   if(GAME_MODE==='harisen'&&!PUNCH){if(G.space)return '宇宙までツッコんだ';if(G.stars===3)return 'ツッコミの鬼';if(G.stars===2)return SD.winTitle||'スッキリ成敗';if(G.stars===1)return 'ツッコミ見習い';return 'ボケを見逃した';}
-  if(GAME_MODE==='smash'||PUNCH){if(!G.stars)return 'まだ店は立っている';if(G.stars===3&&SD.winTitle)return SD.winTitle;if(G.stars===3&&G.missions&&G.missions.every(m=>m.done))return '完全成敗（チャレンジ全達成）';const d=G.damage||0;if(G.zenkai)return '全壊させた';if(d>=1500000)return '店じまいさせた';if(d>=1000000)return stageNo===1?'440円の恨み、倍返しどころじゃない':'倍返しどころじゃない';if(G.tears&&G.tears.find(t=>t.kind==='sign'&&t.done)&&d>=500000)return '440円の貼り紙、破り捨て';if(G.walls>=6&&G.stars<3)return '壁に穴だらけ';if(G.maxChain>=4&&G.broken>=32)return '連鎖の鬼';if(d>=500000)return '大損害';if(d>=200000)return 'そこそこの損害';return 'まだ足りない';}
+  if(GAME_MODE==='smash'||PUNCH){if(!G.stars)return 'まだ店は立っている';if(G.stars===3&&SD.winTitle)return SD.winTitle;if(G.stars===3&&G.missions&&G.missions.every(m=>m.done))return '完全成敗（チャレンジ全達成）';const d=G.damage||0;if(G.zenkai)return '全壊させた';if(d>=1500000)return '店じまいさせた';if(d>=1000000)return '倍返しどころじゃない';if(G.tears&&G.tears.find(t=>t.kind==='sign'&&t.done)&&d>=500000)return 'お品書き、破り捨て';if(G.walls>=6&&G.stars<3)return '壁に穴だらけ';if(G.maxChain>=4&&G.broken>=32)return '連鎖の鬼';if(d>=500000)return '大損害';if(d>=200000)return 'そこそこの損害';return 'まだ足りない';}
   return SD.feat(st);}
 function showResult(){
   if(!G.running)return;G.running=false;if(REC.on)recStop();G.endCard=null;updateShareUI();if(/scroll=1/.test(location.hash))setTimeout(()=>{const r=document.getElementById('result');r.scrollTop=r.scrollHeight;},50);if(SMASHLIKE()&&G.damage!=null&&!G.snap)composeBA();if(!G.snap)captureSnap();
   document.getElementById('rShot').classList.toggle('ba',SMASHLIKE());
   const st=G.stats,distM=st.maxDist/PX_PER_M,distPts=Math.round(distM*200);G.score+=distPts;G.pts.dist=distPts;
-  const SM=SMASHLIKE(),HR=GAME_MODE==='harisen';if(SM){G.score=G.damage||0;}
+  const SM=SMASHLIKE(),HR=GAME_MODE==='harisen';if(SM){G.score=feelScore();}
   const s=G.score,rank=SM?('★'.repeat(G.stars||0)+'☆'.repeat(3-(G.stars||0))):(s>=7000?'S':s>=4500?'A':s>=2500?'B':'C');
-  document.querySelector('#result .score small').textContent=SM?'円':'点';
-  const cmp=SD.cmp||['お通し代',440];document.querySelector('#result .titleLbl').textContent=SM?'妄想修理代（※心の中の話です）　'+((stageNo===1?'お通し'+Math.floor(s/440).toLocaleString('ja-JP')+'杯分':cmp[0]+Math.floor(s/cmp[1]).toLocaleString('ja-JP')+'回分')):'今回の一撃';
+  document.querySelector('#result .score small').textContent='点';
+  const cmp=SD.cmp||['お通し代',600];document.getElementById('rMoneyLbl').textContent=SM?'妄想修理代（※心の中の話です）\n'+((stageNo===1?'お通し'+Math.floor(s/440).toLocaleString('ja-JP')+'杯分':cmp[0]+Math.floor(s/cmp[1]).toLocaleString('ja-JP')+'回分')):'今回の一撃';
   const shot=document.getElementById('rShot');if(G.snap&&G.snap!=='x'){shot.src=G.snap;shot.classList.remove('hidden');}else shot.classList.add('hidden');
   if(!SM){const fy=G.snapFocus!=null?G.snapFocus:H*0.45,pct=clamp((fy/H*16/9-3/8)/(16/9-3/4),0,1);shot.style.objectPosition='50% '+(pct*100).toFixed(1)+'%';} // スクショは衝撃の位置を中心に切り取る
-  document.getElementById('rFeat').textContent=featTitle(st);
+  document.getElementById('rFeat').textContent=featTitle(st);document.getElementById('rWin').textContent=SD.winTitle||featTitle(st);
   const rk=document.getElementById('rRank');rk.textContent=rank;rk.classList.toggle('stars',SM);if(SM)starSet(G.stars||0);document.getElementById('rNo').textContent=stageLabel(stageNo);document.getElementById('rName').textContent=STAGES[stageNo-1];rk.classList.remove('stamp');void rk.offsetWidth;rk.classList.add('stamp');
   const best=bestGet(),bEl=document.getElementById('rBest');
   if(s>best){bestSet(s);bEl.textContent=best?'NEW BEST — 自己ベスト更新':'はじめての記録';bEl.className='best mono new';}else{bEl.textContent='BEST '+best.toLocaleString('ja-JP');bEl.className='best mono';}
-  document.getElementById('rStats').innerHTML=(HR?[['ツッコミ',(G.hits||0)+'回'],['最大連打',(G.maxCombo||0)+'連打'],['壊した数',(G.broken||0)+'個'],['破壊率',Math.min(100,Math.round(100*(G.baseDone||0)/(G.totalValue||1)))+'%']]:SM?[['破壊率',Math.min(100,Math.round(100*(G.baseDone||0)/(G.totalValue||1)))+'%'],['壊した数',(G.broken||0)+'個'],['最大連鎖','×'+(G.maxChain||1).toFixed(1)],['叩きつけ',(G.slams||0)+'回']]:[['命中',st.hits+'回'],['連続',(st.combo||0)>=2?st.combo+'HIT':'—'],['吹き飛ばし',distM.toFixed(1)+'m'],['ジャスト',st.just?'成功':'—']]).map(r=>'<div class="stat"><b>'+r[1]+'</b><span>'+r[0]+'</span></div>').join('');
-  document.querySelector('#result .score').style.fontSize=String(Math.round(s)).length>=7?'calc(var(--u)*32)':'';
-  const el=document.getElementById('rScore'),t0=performance.now();(function cnt(n){const k=Math.min(1,(n-t0)/700);el.textContent=Math.round(s*(1-Math.pow(1-k,3))).toLocaleString('ja-JP');if(k<1)requestAnimationFrame(cnt);})(t0);
+  document.getElementById('rStats').innerHTML=(HR&&SD.projectile?[['最大連鎖','×'+(G.maxChain||1).toFixed(1)],['投げた数',(G.throws||0)+'回'],['壊した数',(G.broken||0)+'個'],['破壊率',Math.min(100,Math.round(100*(G.baseDone||0)/(G.totalValue||1)))+'%']]/* 人を殴らないステージ（STAGE 13）は連打の代わりに連鎖と投げた数 */:HR?[['最大コンボ',(G.maxCombo||0)+'連打'],['クリティカル',(G.crits||0)+'回'],['最大連鎖','×'+(G.maxChain||1).toFixed(1)],['破壊率',Math.min(100,Math.round(100*(G.baseDone||0)/(G.totalValue||1)))+'%']]:SM?[['破壊率',Math.min(100,Math.round(100*(G.baseDone||0)/(G.totalValue||1)))+'%'],['壊した数',(G.broken||0)+'個'],['最大連鎖','×'+(G.maxChain||1).toFixed(1)],['叩きつけ',(G.slams||0)+'回']]:[['命中',st.hits+'回'],['連続',(st.combo||0)>=2?st.combo+'HIT':'—'],['吹き飛ばし',distM.toFixed(1)+'m'],['ジャスト',st.just?'成功':'—']]).map(r=>'<div class="stat"><b>'+r[1]+'</b><span>'+r[0]+'</span></div>').join('');
+  
+  const el=document.getElementById('rScore'),t0=performance.now();el.textContent=Math.round(s).toLocaleString('ja-JP');/* 最終の点数を先に出す。画面が動いているときだけ、0から増える演出をする（非表示などで止まっても0のまま残らない） */if(!document.hidden)requestAnimationFrame(function cnt(n){const k=Math.min(1,Math.max(0,(n-t0)/700));el.textContent=Math.round(s*(1-Math.pow(1-k,3))).toLocaleString('ja-JP');if(k<1)requestAnimationFrame(cnt);else el.textContent=Math.round(s).toLocaleString('ja-JP');});
   G.lastResult={feat:featTitle(st),rank,score:s};
   document.getElementById('result').classList.remove('hidden');
 }
@@ -2318,7 +2522,13 @@ function start(){
 /* ================= TOP：16ステージのカード束。見ているカードのステージを「成敗する」で始める ================= */
 /* ステージ切り替え：設定・登場人物・背景をまとめて差し替える */
 const BGS={};
-function stageBG(){if(BGS[stageNo])return BGS[stageNo];const im=SD.bg&&EXT[SD.bg];if(!im)return BGS[1]||BG;const c=document.createElement('canvas');c.width=1080;c.height=1920;c.getContext('2d').drawImage(im,0,0,1080,1920);c.ext=true;return BGS[stageNo]=c;}
+function stageBG(){if(BGS[stageNo])return BGS[stageNo];const im=SD.bg&&EXT[SD.bg];if(!im)return BGS[1]||BG;const c=document.createElement('canvas');c.width=1080;c.height=1920;c.getContext('2d').drawImage(im,0,0,1080,1920);if(stageNo===15&&SD.bg==='bg_office')paintClock(c.getContext('2d'),530,780,17,50);if(stageNo===13&&SD.bg==='bg_ldk')eraseCooker(c.getContext('2d'));if(stageNo===3&&SD.bg==='bg_platform')paintClock(c.getContext('2d'),178,515,8,12,46); /* 駅の時計を 8:12 に */if(stageNo===9&&SD.bg==='bg_ldk'){const x=c.getContext('2d');x.save();x.globalCompositeOperation='multiply';x.fillStyle='rgba(40,52,110,0.78)';x.fillRect(0,928,47,384);x.restore();} /* 22時なので窓の外を夜空に */if(stageNo===16&&SD.bg==='bg_train'){const x=c.getContext('2d');x.save();x.globalCompositeOperation='multiply';x.fillStyle='rgba(38,48,100,0.8)';for(const [wx,ww] of [[236,354],[634,336]])x.fillRect(wx,684,ww,346);x.restore();} /* 21:40 の電車：窓の外を夜に */c.ext=true;return BGS[stageNo]=c;}
+/* STAGE 13：背景のカウンターに描かれている炊飯器を消す（投げる炊飯器と2台にならないように）。壁の色で塗りつぶす */
+function eraseCooker(x){const cv=x.canvas;for(let k=0;k<2;k++)x.drawImage(cv,840,1219,62,99,714+k*61,1219,62,99);} /* 炊飯器の右隣の壁（無地の部分）を写して埋める。平らな色で塗ると四角い跡が目立つため */
+/* 背景の壁時計の針を、場面の時刻に描き直す（STAGE 15 は 17:50。元の絵は10時10分） */
+function paintClock(x,cx,cy,hh,mm,rr){rr=rr||44;x.save();x.fillStyle='#F7F5F1';x.beginPath();x.arc(cx,cy,rr,0,7);x.fill();x.strokeStyle='#2B2422';x.lineCap='round';
+  const hand=(ang,len,w)=>{x.lineWidth=w;x.beginPath();x.moveTo(cx,cy);x.lineTo(cx+Math.sin(ang)*len,cy-Math.cos(ang)*len);x.stroke();};
+  hand(((hh%12)+mm/60)/12*Math.PI*2,rr*0.68,9);hand(mm/60*Math.PI*2,rr,6);x.fillStyle='#2B2422';x.beginPath();x.arc(cx,cy,7,0,7);x.fill();x.restore();}
 function setStage(n){stageNo=n;SD=STAGE_DEFS[n];useChar(SD.char||'karube');BG=stageBG();}
 let deckIdx=0;
 function cardHTML(i){
@@ -2342,7 +2552,7 @@ function goCard(i,smooth){const d=document.getElementById('deck');deckIdx=clamp(
 let deckAuto=null,deckTouched=false;
 function buildTitle(){
   clearInterval(deckAuto);deckAuto=setInterval(()=>{const t=document.getElementById('title');if(deckTouched||!t||t.classList.contains('hidden'))return;goCard((deckIdx+1)%STAGES.length,true);},3600);
-  {const open=STAGES.filter((_,i)=>stageReady(i+1)).length;document.getElementById('tFoot').textContent='SEIBAI β — 全'+STAGES.length+'ステージ（'+open+'ステージ公開中）';}
+  {const open=STAGES.filter((_,i)=>stageReady(i+1)).length;document.getElementById('tFoot').textContent='全'+STAGES.length+'ステージ';}
   const d=document.getElementById('deck');d.innerHTML=STAGES.map((_,i)=>cardHTML(i)).join('');
   if(!d.dataset.touchHook){d.dataset.touchHook=1;['pointerdown','touchstart','wheel'].forEach(ev=>d.addEventListener(ev,()=>{deckTouched=true;},{passive:true}));}
   d.querySelectorAll('.card').forEach(el=>el.addEventListener('click',()=>{const i=+el.dataset.i;if(i!==deckIdx){ensureAudio();sfx('grab');goCard(i,true);}}));
@@ -2361,7 +2571,7 @@ document.querySelectorAll('[data-close]').forEach(el=>el.addEventListener('click
 function toTitle(){document.body.style.background='';reset();buildTitle();document.getElementById('result').classList.add('hidden');document.getElementById('title').classList.remove('hidden');}
 async function share(){
   const r=G&&G.lastResult;if(!r)return;
-  const text=(SMASHLIKE()?SD.share.text+'\n'+r.rank+'（5投）'+(SD.cmp?SD.cmp[0]+' ¥'+SD.cmp[1].toLocaleString('ja-JP'):'お通し代 ¥440')+' → 妄想修理代 ¥'+r.score.toLocaleString('ja-JP')+'\n「'+r.feat+'」':SD.share.text+'\n「'+r.feat+'」'+r.rank+'ランク '+r.score.toLocaleString('ja-JP')+'点')+'\n'+SD.share.tags+(SHARE_URL?'\n'+SHARE_URL:'');
+  const text=(SMASHLIKE()?SD.share.text+'\n称号「'+(SD.winTitle||r.feat)+'」　爽快スコア '+r.score.toLocaleString('ja-JP')+'点':SD.share.text+'\n「'+r.feat+'」'+r.rank+'ランク '+r.score.toLocaleString('ja-JP')+'点')+'\n'+SD.share.tags+(SHARE_URL?'\n'+SHARE_URL:'');
   try{
     if(navigator.share){let files;if(G.snap&&G.snap!=='x'&&navigator.canShare){const bl=await (await fetch(G.snap)).blob(),f=new File([bl],'seibai.jpg',{type:'image/jpeg'});if(navigator.canShare({files:[f]}))files=[f];}
       await navigator.share(files?{text,files}:{text});return;}
@@ -2422,7 +2632,7 @@ function updateShareUI(){const b=document.getElementById('shareVid'),n=document.
   else if(REC.blob){b.disabled=false;n.textContent=Math.max(1,Math.round(REC.dur||0))+'秒の成敗ムービー';}
   else{b.disabled=true;n.textContent=REC.err?'録画に失敗しました。画像でシェアしてね':'今回は録画できませんでした';}}
 function resultText(){const r=G&&G.lastResult;if(!r)return SD.share.text+'\n'+SD.share.tags;
-  return (SMASHLIKE()?SD.share.text+'\n'+r.rank+'（5投）'+(SD.cmp?SD.cmp[0]+' ¥'+SD.cmp[1].toLocaleString('ja-JP'):'お通し代 ¥440')+' → 妄想修理代 ¥'+r.score.toLocaleString('ja-JP')+'\n「'+r.feat+'」':SD.share.text+'\n「'+r.feat+'」'+r.rank+'ランク '+r.score.toLocaleString('ja-JP')+'点')+'\n'+SD.share.tags+(SHARE_URL?'\n'+SHARE_URL:'');}
+  return (SMASHLIKE()?SD.share.text+'\n称号「'+(SD.winTitle||r.feat)+'」　爽快スコア '+r.score.toLocaleString('ja-JP')+'点':SD.share.text+'\n「'+r.feat+'」'+r.rank+'ランク '+r.score.toLocaleString('ja-JP')+'点')+'\n'+SD.share.tags+(SHARE_URL?'\n'+SHARE_URL:'');}
 async function shareVideo(){
   if(!REC.blob){toast(REC.fin?'動画を仕上げ中です。少し待ってね':'動画はプレイ中に自動で録画されます');return;}
   const ext=/mp4/.test(REC.blob.type)?'mp4':'webm',name='seibai_stage'+String(stageNo).padStart(2,'0')+'.'+ext,f=new File([REC.blob],name,{type:REC.blob.type}),text=resultText();
@@ -2452,11 +2662,11 @@ function mountOdai(){document.querySelectorAll('[data-odai]').forEach(box=>{box.
   upd();});}
 mountOdai();
 
-document.getElementById('start').addEventListener('click',()=>{if((G&&G.running)||!stageReady(deckIdx+1))return;start();});document.getElementById('retry').addEventListener('click',start);document.getElementById('toTitle').addEventListener('click',toTitle);
+document.getElementById('start').addEventListener('click',()=>{if((G&&G.running)||!stageReady(deckIdx+1))return;start();});document.getElementById('retry').addEventListener('click',start);document.getElementById('nextStage').addEventListener('click',()=>{const n=stageNo%STAGES.length+1;if(!stageReady(n))return;setStage(n);deckIdx=n-1;start();});/* 次のステージへ */document.getElementById('toTitle').addEventListener('click',toTitle);
 
 /* キャンバスに描く文字（セリフ・案内・ステージ名など）を、Zen Kaku / Plex Mono で先に読み込む */
-const UI_TEXT='ツッコミ回連打相手をタップ連打でハリセンツッコミ最大ボケを見逃した見習いの鬼宇宙までツッコんだ'+'ひぃっうわっなにそれっ'+'12141晴らした商店街ホーム列に並ばせた通りごと鎮火お断りした車内詰めさせた店★☆✓□残り次の一投引っぱって離して飛ばせ個まとめてチャレンジ達成3投以内で1投で10個以上壊す完全成敗クリア失敗まだ店は立っているいけぇぶっとべ'+Object.values(STAGE_DEFS).map(d=>JSON.stringify(d)).join('')+WORDS_DEF.join('')+'破壊率全壊ボーナスBEFOREAFTER'+'品書きのれんお通し代の貼り紙破り捨て床にヒビ空中キャッチ叩きつけドスンゴシャッズドンゴンビリィッ'+'お店の人をつかんでぶん投げろブチギレMAX思いっきり連鎖×壁に穴損害額円杯分壊した数最大投げたそこまで店じまいさせた倍返しどころじゃない大損害足りない'+Object.values(PRICE).map(v=>v[1]).join('')+'招き猫提灯お通しの器テーブル¥−'+'スッキリ満タン文字返しイライラ泣き寝入り払います'+STAGES.join('')+'ためていまだ…※お通しはお断りできません御会計STAGE0123456789s×,';
-const fontsReady=(document.fonts&&document.fonts.load)?Promise.all([document.fonts.load('900 16px "Zen Kaku Gothic New"',UI_TEXT),document.fonts.load('700 16px "Zen Kaku Gothic New"',UI_TEXT),document.fonts.load('500 16px "Zen Kaku Gothic New"',UI_TEXT),document.fonts.load('600 16px "IBM Plex Mono"','STAGE 0123456789,s×¥'),document.fonts.load('500 16px "IBM Plex Mono"','STAGE 0123456789:'),document.fonts.load('40px "Dela Gothic One"','なんでやねん！どないやねんおかしいやろええかげんにせえ知らんがなやりすぎや440円取るなポップコーンてお通しちゃうやろ断らせろ30分て今起きたちゃうわ謝れ並べ列見えるやろ急いでても煙こっち来とる歩きタバコやめ灰皿持て行かんてしつこいついてくんな足閉じろ2人分や詰めろスカッハリセン巨大化超巨大宇宙までツッコミ連打★☆完全成敗！クリア失敗…いけぇ！ぶっとべ個まとめて全壊！ラスト、ちゃぶ台返し！ドスンゴシャッズドンゴン！ビリッビリィッ440円、破り捨て空中キャッチ×ブン！ぶんっポイッブチギレ連鎖×ガシャーンパリーンバリーンドゴォッそこまで！列の先頭にすっと入るな2人分座って空いてる言うなお通しにポップコーンやめんかい！！30分待たせてそれかい断ってるのに横歩きでついてくるな歩きタバコの煙がこっち来とる成敗。ガッシャーンバッシャーンドガシャーンゴッバコッペシッポコッベチッズガッ連鎖！ジャストいまだためて…ガシャンSTAGE0123456789×+HIT!バシャーッビシャッドスッバキィッ'),document.fonts.load('800 16px "M PLUS 1p"','心の声お通し代440円'),document.fonts.load('900 16px "M PLUS 1p"'),document.fonts.load('900 100px "Zen Kaku Gothic New"','成敗法律違反じゃない。でも、なんか腹立つ悪いのは店の決まりお通しがポップコーンステージ選択遊び方全員にお出ししております断りはできません'),document.fonts.load('600 12px "IBM Plex Mono"','STAGE 0123456789/¥BEST,FIG.')]).catch(()=>{}):Promise.resolve();
+const UI_TEXT='ツッコミ回連打相手をタップ連打でハリセンツッコミ最大ボケを見逃した見習いの鬼宇宙までツッコんだ'+'ひぃっうわっなにそれっ'+'12141晴らした商店街ホーム列に並ばせた通りごと鎮火お断りした車内詰めさせた店★☆✓□残り次の一投引っぱって離して飛ばせ個まとめてチャレンジ達成3投以内で1投で10個以上壊す完全成敗クリア失敗まだ店は立っているいけぇぶっとべ'+Object.values(STAGE_DEFS).map(d=>JSON.stringify(d)).join('')+WORDS_DEF.join('')+'破壊率全壊ボーナスBEFOREAFTER'+'品書きのれんお品書きの貼り紙破り捨て床にヒビ空中キャッチ叩きつけドスンゴシャッズドンゴンビリィッ'+'お店の人をつかんでぶん投げろブチギレMAX思いっきり連鎖×壁に穴損害額円杯分壊した数最大投げたそこまで店じまいさせた倍返しどころじゃない大損害足りない'+Object.values(PRICE).map(v=>v[1]).join('')+'招き猫提灯お通しの器テーブル¥−'+'スッキリ満タン文字返しイライラ泣き寝入り払います'+STAGES.join('')+'ためていまだ…※お通しはお断りできません御会計STAGE0123456789s×,';
+const fontsReady=(document.fonts&&document.fonts.load)?Promise.all([document.fonts.load('900 16px "Zen Kaku Gothic New"',UI_TEXT),document.fonts.load('700 16px "Zen Kaku Gothic New"',UI_TEXT),document.fonts.load('500 16px "Zen Kaku Gothic New"',UI_TEXT),document.fonts.load('600 16px "IBM Plex Mono"','STAGE 0123456789,s×¥'),document.fonts.load('500 16px "IBM Plex Mono"','STAGE 0123456789:'),document.fonts.load('40px "Dela Gothic One"','なんでやねん！どないやねんおかしいやろええかげんにせえ知らんがなやりすぎや600円取るな説明してやお席代て何全部頭の中の話。ポップコーンてお通しちゃうやろ断らせろ30分て今起きたちゃうわ謝れ並べ列見えるやろ急いでても煙こっち来とる歩きタバコやめ灰皿持て行かんてしつこいついてくんな足閉じろ2人分や詰めろスカッハリセン巨大化超巨大宇宙までツッコミ連打★☆完全成敗！クリア失敗…いけぇ！ぶっとべ個まとめて全壊！ラスト、ちゃぶ台返し！ドスンゴシャッズドンゴン！ビリッビリィッ600円お品書き、破り捨て空中キャッチ×ブン！ぶんっポイッブチギレ連鎖×ガシャーンパリーンバリーンドゴォッそこまで！列の先頭にすっと入るな2人分座って空いてる言うなお通しにポップコーンやめんかい！！30分待たせてそれかい断ってるのに横歩きでついてくるな歩きタバコの煙がこっち来とる成敗。ガッシャーンバッシャーンドガシャーンゴッバコッペシッポコッベチッズガッ連鎖！ジャストいまだためて…ガシャンSTAGE0123456789×+HIT!バシャーッビシャッドスッバキィッ'),document.fonts.load('800 16px "M PLUS 1p"','心の声お通し代600円'),document.fonts.load('900 16px "M PLUS 1p"'),document.fonts.load('900 100px "Zen Kaku Gothic New"','成敗法律違反じゃない。でも、なんか腹立つ悪いのは店の決まりお通しがポップコーンステージ選択遊び方全員にお出ししております断りはできません'),document.fonts.load('600 12px "IBM Plex Mono"','STAGE 0123456789/¥BEST,FIG.')]).catch(()=>{}):Promise.resolve();
 Promise.race([fontsReady,new Promise(r=>setTimeout(r,1800))]).then(loadExternal).then(applyLine).then(buildArt).then(buildKit).then(buildPeeps).then(()=>{
   BGS[1]=BG;setStage(stageNo);reset();buildTitle();if(location.hash==='#stages')openSheet('stages');else if(location.hash==='#how')openSheet('how');{const am=/auto=(\w+)/.exec(location.hash);if(am)setTimeout(()=>autoDemo(am[1]),300);}document.getElementById('loading').classList.add('hidden');document.getElementById('title').classList.remove('hidden');requestAnimationFrame(frame);
 });
@@ -2473,12 +2683,12 @@ function autoDemo(mode,tries){
         step();k++;}
       const ok=!document.getElementById('result').classList.contains('hidden');document.getElementById('result').classList.add('hidden');
       R.push({i,n,ok,frames:k,taps,dmg:Math.round(G.damage||0),stars:G.stars||0});};
-    let i=0;const iv=setInterval(()=>{try{one(i);}catch(e){R.push({i,n:1+(i%16),ok:false,err:String(e&&e.message)});}i++;document.body.dataset.st='stress '+i+'/'+N;if(i>=N){clearInterval(iv);const fails=R.filter(r=>!r.ok);document.body.dataset.live=JSON.stringify({total:R.length,ok:R.length-fails.length,fails,errs:window.__errs||[],avgFrames:Math.round(R.reduce((a,r)=>a+(r.frames||0),0)/R.length),minDmg:Math.min(...R.map(r=>r.dmg||0)),maxDmg:Math.max(...R.map(r=>r.dmg||0)),zeroStar:R.filter(r=>r.ok&&!r.stars).length});}},10);return;}
+    const O=+((/o=(\d+)/.exec(location.hash)||[])[1]||0);for(let j=0;j<O*3;j++)rnd();let i=O;const iv=setInterval(()=>{try{one(i);}catch(e){R.push({i,n:1+(i%16),ok:false,err:String(e&&e.message)});}i++;document.body.dataset.st='stress '+(i-O)+'/'+N;if(i>=O+N){clearInterval(iv);const fails=R.filter(r=>!r.ok);document.body.dataset.live=JSON.stringify({total:R.length,ok:R.length-fails.length,fails,errs:window.__errs||[],avgFrames:Math.round(R.reduce((a,r)=>a+(r.frames||0),0)/R.length),minDmg:Math.min(...R.map(r=>r.dmg||0)),maxDmg:Math.max(...R.map(r=>r.dmg||0)),zeroStar:R.filter(r=>r.ok&&!r.stars).length});}},10);return;}
   if(mode==='live'){/* 確認用：実時間で自動プレイ（録画の確認用）。終わったら body に結果を書く。画面の無い環境でも進むよう setInterval で回す */start();setInterval(()=>frame(performance.now()),16);const iv=setInterval(()=>{if(G.phase==='smash'&&G.shot==='aim'&&G.staff.mode==='anim'){const t=SD.projectile?projAnchor():G.staff.P.torso.position;G.sling={id:1,ax:t.x,ay:t.y,cx:t.x+90,cy:t.y+50};launchSling();if(/one=1/.test(location.hash))G.shots=0;}
     document.body.dataset.st=G.phase+'|'+G.shot+'|rec:'+REC.on+'|fin:'+REC.fin+'|chunks:'+REC.chunks.length;const r=document.getElementById('result');if(r&&!r.classList.contains('hidden')&&!REC.fin&&!REC.on){clearInterval(iv);window.__recBlob=REC.blob;document.body.dataset.live=JSON.stringify({blob:REC.blob?REC.blob.size:0,type:REC.blob?REC.blob.type:'',dur:REC.dur,note:document.getElementById('vidNote').textContent,dis:document.getElementById('shareVid').disabled});}},300);return;}
   start();let T=performance.now();const step=()=>{T+=1000/60;tick(T);};
   if(mode==='fly'){/* 確認用：一投目を投げて、飛んでいる最中で止める */for(let k=0;k<3000&&G.phase==='intro';k++)step();for(let k=0;k<600&&!(G.shot==='aim'&&G.staff.mode==='anim');k++)step();const t=G.staff.P.torso.position;G.sling={id:1,ax:t.x,ay:t.y,cx:t.x+110,cy:t.y+60};launchSling();const tm=/t=([\d.]+)/.exec(location.hash);for(let k=0;k<(tm?+tm[1]:0.5)*60;k++)step();return;}
-  if(mode==='thumb'){/* TOPのカード用：決定的な一言の場面で止める（下の帯・透かし・あなた札なし） */const sc=SD.script||[],fi=sc.findIndex(x=>x&&x.focus);for(let k=0;k<3000&&G.phase==='intro';k++){step();if(SD.thumbT){if(G.phaseT>=SD.thumbT)break;continue;}if(fi>=0&&G.si>fi)break;if(fi>=0&&G.si===fi&&G.st>=Math.min(1.1,(sc[fi].wait||1.2)-0.1))break;if(!SD.script&&G.step===3&&G.stepT>1.0)break;}G.thumb=true;return;}
+  if(mode==='thumb'){/* TOPのカード用：決定的な一言の場面で止める（下の帯・透かし・あなた札なし） */const sc=SD.script||[],fi=sc.findIndex(x=>x&&(x.thumb||x.focus));for(let k=0;k<3000&&G.phase==='intro';k++){step();if(SD.thumbT){if(G.phaseT>=SD.thumbT)break;continue;}if(fi>=0&&G.si>fi)break;if(fi>=0&&G.si===fi&&G.st>=Math.min(1.1,(sc[fi].wait||1.2)-0.1))break;if(!SD.script&&G.step===3&&G.stepT>1.0)break;}G.thumb=true;return;}
   {const tm=/t=([\d.]+)/.exec(location.hash);if(mode==='intro'){const T0=+(tm?tm[1]:6);for(let k=0;k<T0*60&&G.phase==='intro';k++)step();return;}}
   if(mode==='ochi'){for(let k=0;k<1500&&G.phase==='intro';k++)step();for(let k=0;k<9000&&G.phase==='smash';k++){if(G.shot==='aim'&&G.staff.mode==='anim'){const P=SD.projectile,t=P?projAnchor():G.staff.P.torso.position;G.sling={id:1,ax:t.x,ay:t.y,cx:t.x+60,cy:t.y+40};launchSling();}step();}const tm2=/t=([\d.]+)/.exec(location.hash);for(let k=0;k<(tm2?+tm2[1]:2.8)*60&&G.phase==='ochi';k++)step();return;}
   const play=G2=>{const ph=GAME_MODE==='harisen'?'harisen':GAME_MODE==='smash'?'smash':GAME_MODE==='words'?'words':'throw';return G.phase!==ph;};
@@ -2503,7 +2713,7 @@ function autoDemo(mode,tries){
   if(mode==='down'){for(let k=0;k<600&&!G.olt;k++)step();for(let k=0;k<20;k++)step();return;}
   for(let k=0;k<900&&G.running;k++)step();
 }
-window.__seibai={get G(){return G;},start,flip,release,STAGES,EXT,ART,DBG,STAGE_DEFS,frame:tick,get SMPN(){return AU.smp?Object.values(AU.smp).reduce((a,l)=>a+l.length,0):-1;},__tap:(x,y)=>hariHit({x,y}),setStage:n=>setStage(n),__returnWord:w=>returnWord(w),__grab:(w)=>grabAt(w,1),__sling:(cx,cy)=>{const t=SD.projectile?projAnchor():G.staff.P.torso.position;G.sling={id:1,ax:t.x,ay:t.y,cx,cy};launchSling();},__move:w=>moveGrab(w),__release:()=>releaseGrab(),get KAR(){return KAR;},get R(){return R;}};
+window.__seibai={get G(){return G;},start,flip,release,STAGES,EXT,ART,DBG,STAGE_DEFS,frame:tick,get SMPN(){return AU.smp?Object.values(AU.smp).reduce((a,l)=>a+l.length,0):-1;},__tap:(x,y)=>hariHit({x,y}),setStage:n=>setStage(n),__returnWord:w=>returnWord(w),__grab:(w)=>grabAt(w,1),__sling:(cx,cy)=>{const t=SD.projectile?projAnchor():G.staff.P.torso.position;G.sling={id:1,ax:t.x,ay:t.y,cx,cy};launchSling();},__move:w=>moveGrab(w),__release:()=>releaseGrab(),get KAR(){return KAR;},get R(){return R;},/* 確認用：ゲーム内の座標→画面上の位置（実際のタップを送るテスト用） */toClient:(x,y)=>{const r=cv.getBoundingClientRect();return {x:r.left+((x-G.camX)*G.zoom+W/2)/W*r.width,y:r.top+((y-G.camY)*G.zoom+H/2)/H*r.height};}};
 })();
 </script>
 </body>
